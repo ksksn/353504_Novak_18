@@ -1,5 +1,5 @@
 <<<<<<< HEAD
 hello
 =======
-hello, friend
+hello, friend bye
 >>>>>>> b57fd162a5c2144c140e45d8c417d12ac32ca6a1
