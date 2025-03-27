@@ -1,0 +1,12 @@
+.name{
+font-weight: 500;
+font-size: 30px;
+line-height: 37px;
+letter-spacing: -0.03em;
+text-transform: capitalize;
+display: flex;
+align-items:center;
+text-decoration: none;
+
+color: #F2F1F8;
+}

@@ -1,0 +1,56 @@
+.MainPage{
+    background: #FFFFFF;
+    width: 94%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 3%;
+    border-radius: 5px;
+}
+.Content
+{
+    border: 2px #2B233B solid;
+    border-radius: 5px;
+    min-height: 450px;
+    padding: 5%;
+}
+.Header{
+    
+    display: flex;
+    justify-content: space-between;
+    font-size: 18px;
+    font-weight: 500;
+    color: #000;
+}
+.tableSettings{
+    margin-top: 15px;
+    width: 100%;
+    font-size: 14px;
+    border-top: 2px #E9E7EA solid;
+    border: 2px #E9E7EA solid;
+}
+
+.tableSettings tr
+{
+    border: 2px #E9E7EA solid;
+    color: 2px #E9E7EA solid;
+}
+
+.tableSettings tr:first-child
+{
+    color: #9B939E;
+}
+
+.tableSettings td{
+    border: 2px #E9E7EA solid;
+    
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.Letter{
+    width: 60px;
+}
+
+td{
+    border: 2px #E9E7EA solid;
+}

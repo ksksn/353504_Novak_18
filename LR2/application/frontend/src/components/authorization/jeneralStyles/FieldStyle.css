@@ -1,0 +1,30 @@
+.field {
+    display: block;
+    height: 40px;
+    width: 300px;
+    position: center;
+    margin-top: 23px;
+    margin-bottom: 6px;
+    background: #F2F1F8;
+    border-radius: 10px;
+}
+input{
+
+    
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: -0.025em;
+    color: #000000;
+    padding-left: 17px;
+    border: 1px solid #9F9CA0;
+}
+input:focus{
+    outline-color: #6B31B5;
+    outline-width: 2px;
+}
+.errorInput{
+    border: 2px solid red;
+}

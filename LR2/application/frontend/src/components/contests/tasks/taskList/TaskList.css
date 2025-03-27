@@ -1,0 +1,62 @@
+.taskListForm{
+    margin-left: 2%;
+    margin-right: 2%;
+    margin-top: 5%;
+    padding-left: 7%;
+    padding-right: 7%;
+    padding-top: 25px;
+    padding-bottom: 35px;
+    background: #FFFFFF;
+    border: 1px solid #2B233B;
+    border-radius: 5px;
+}
+.createContestWidth{
+width: 95%;
+}
+.info{
+    background: #FFFFFF;
+    border: 3px solid #2C243C;
+    border-radius: 0px 10px 10px 0px;
+}
+
+.taskHeader{
+    font-size: 22px;
+    font-weight: 500;
+    margin-bottom: 35px;
+}
+.contestHeader{
+    width: 400px;
+}
+.taskNameList{
+    display: flex;
+    justify-content: space-between;
+    font-weight: 500;
+    font-size: 18px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+.mysollution{
+    width: auto;
+    background: #FFFFFF;
+    border: 1px solid #6B31B5;
+    border-radius: 5px;
+    Height: 30px;
+    font-size: 16px;
+    line-height: 20px;
+    letter-spacing: -0.05em;
+    color: #6B31B5;
+}
+
+.standingButton{   
+    width: 175px;
+    height: 30px;
+    border: 1px solid #6B31B5;
+    border-radius: 5px;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 20px;
+    margin-top: 15px;
+    margin-bottom: 20px;
+    margin-left: 82.8%;
+}

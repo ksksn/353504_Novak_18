@@ -1,0 +1,11 @@
+.label {
+line-height: 20px;
+display: flex;
+justify-content:center;
+align-items: center;
+text-align: center;
+letter-spacing: -0.04em;
+margin-bottom: 3px;
+
+color: #000000;
+}

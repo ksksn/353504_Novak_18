@@ -1,0 +1,36 @@
+.navigationBar{
+    display: flex;
+    justify-content: right;
+    align-items:center;
+}
+.navigationBar a{
+    line-height: 20px;
+    letter-spacing: -0.02em;
+    color: #FFFFFF;
+    text-decoration: none;
+    position: center;
+    justify-content:center;
+    align-items: center;
+    text-align: center;
+    margin-right: 40px;
+}
+
+.active{
+    background: linear-gradient(97.04deg, #944AF2 31.29%, #CA59FF 92.95%);
+    border-radius: 50px;
+    width: auto;
+    height: auto;
+    padding: 7px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.authLinks a{
+    font-size: 12px;
+    margin-left: 15px;
+    margin-right: 0px;
+}
+.palka{
+    margin-left: 15px;
+    color: #FFFFFF;
+}

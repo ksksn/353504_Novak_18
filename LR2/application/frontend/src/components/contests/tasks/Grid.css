@@ -1,0 +1,154 @@
+.app-wrapper{
+    display: grid;
+    grid-template-columns: 1fr 5fr;
+    text-align: justify;
+}
+
+.content{
+    padding-left: 5%;
+    padding-right: 5%;
+    background: #FFFFFF;
+    border: 3px solid #2C243C;
+    border-radius: 0px 10px 10px 0px;
+}
+.menu{
+    background: #FFFFFF;
+    border: 3px solid #2C243C;
+    border-radius: 10px 0px 0px 10px;
+    padding-top: 20px;
+    padding-left: 10%;
+    padding-right: 10%;
+}
+
+.headline{
+    font-weight: 500;
+    font-size: 18px;
+    letter-spacing: -0.04em;
+    line-height: 22px;
+    color: #000000;
+    padding-bottom: 10px;
+}
+
+.contestsName{
+    font-weight: 700;
+    font-size: 32px;
+    line-height: 39px;
+}
+
+.status{
+    letter-spacing: -0.01em;
+    color: #CDC9CE;
+    padding-bottom: 7px;
+}
+
+.line{
+    border: 1px solid #E6E4E7;
+    margin-bottom: 20px;
+}
+
+.BackToTasks{
+    display:flex;
+}
+
+.navigation {
+    margin-left: 3%;
+    margin-top: 20px;
+    color: #6B31B5;
+}
+
+.navigation a{
+    color: #9B939E;
+    text-decoration: none;
+}
+
+.limits{
+    color: #9B939E;
+}
+
+textarea{
+    width: 100%;
+    background: #E9E7EA;
+}
+
+.input-file {
+    margin-right: 30px;
+
+    font-weight: 400;
+    outline: none;
+    text-decoration: none;
+    font-weight: 500;
+	font-size: 13px;
+	color: #000000;
+	text-align: center;
+    background: #FFFFFF;
+    border: 2px solid #6B31B5;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.input-file ::-webkit-file-upload-button{
+    background-color: #000000;
+}
+
+.input-file:active {
+	background-color: #9670c8;
+    color: #FFFFFF;
+}
+
+.compiler{
+    text-align: center;
+    margin-top: 30px;
+    margin-right: 5px;
+    letter-spacing: -0.035em;
+    font-weight: 400;
+    font-size: 14px;
+    color: #5E5C5C;
+}
+
+select{
+    background: #FFFFFF;
+    border: 2px solid #6B31B5;
+    border-radius: 5px;
+    width: 100px;
+    height: 30px;
+    font-weight: 400;
+    font-size: 14px;
+}
+
+option{
+    font-size: 14px;
+    line-height: 16px;
+    text-align: center;
+
+    color: #000000;
+
+}
+.sendButton{
+    width: 130px;
+    height: 35px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+.buttonText{
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+    text-align: center;
+    letter-spacing: 0.055em;
+
+    color: #FFFFFF;
+}
+
+.arrow {
+    width: 8px;
+    height: 8px;
+    border-top: 3px solid #8E8491;
+    border-right: 3px solid #8E8491;
+    transform: rotate(-135deg);
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-right: 5px;
+}  

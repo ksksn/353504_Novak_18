@@ -1,0 +1,9 @@
+
+.worldResTable tr:nth-of-type(2)
+{
+    background-color: rgba(211, 154, 255, 0.507);
+}
+
+.tasks{
+    justify-content: space-between;
+}

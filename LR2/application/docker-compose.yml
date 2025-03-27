@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+
+  database:
+    build:
+      context: .
+      dockerfile: ./server/database/Dockerfile
+    container_name: database
+    environment:
+      - MY_SQL_ROOT_PASSWORD=password
+      - MYSQL_HOST=database
+      - MYSQL_USER=myuser
+      - MYSQL_PASSWORD=mypassword
+#      - INIT_SQL= ./database/database.sql
+    ports:
+      - "3306:3306"
+    restart:
+      always
+    networks:
+      - network_for_connect
+    volumes:
+      - ./db-data:/var/lib/mysql
+
+  backend:
+    build: ./server/backend
+    container_name: backend
+    ports:
+     - "8000:8000"
+    networks:
+     - network_for_connect
+    environment:
+      - DB_SERVER=database
+    depends_on:
+      - database
+    restart:
+      always
+    volumes:
+       - ../../../../.:/go
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+    - "3000:3000"
+    networks:
+    - network_for_connect
+    restart:
+      always
+
+networks:
+  network_for_connect:
+
+volumes:
+  db-data:

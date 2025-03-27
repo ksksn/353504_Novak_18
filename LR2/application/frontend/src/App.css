@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+body {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-size: 16px;
+    letter-spacing: -0.015em;
+    font-weight: 400;
+    
+    justify-content: center;
+    background-color: #2B233B;
+    height: 100vh;
+    color: #2B233B;
+}
+button{
+    font-family: 'Montserrat';
+    font-style: normal;
+    width: 320px;
+    height: 46px;
+    border-radius: 10px;
+    border: 0;
+    background-color: #6B31B5;
+
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 22px;
+    position: center;
+    text-align: center;
+    color: #FFFFFF;
+
+    cursor: pointer;
+    transition: 500ms;
+}
+button>p{
+    margin: 0;
+}
+button:hover{
+    background-color: #a592be;
+    transition: 500ms;
+}
+
+.mainForm {
+    justify-content: center;
+    display: flex;
+    flex-flow: row wrap;
+    left: 0%;
+    right: 0%;
+    top: -5.05%;
+    background: #FFFFFF;
+    border-radius: 5px;
+    width: auto;
+    height: auto;
+    padding-bottom: 5%;
+}
+
+.neMainForm{
+    top: -5.05%;
+    background: #ffffff;
+    border-radius: 5px;
+    padding-bottom: 5%;
+    padding-left: 5%;
+    padding-top: 1%;
+}
+
+img{
+    height: 200px;
+    width: 200px;
+    float:right;
+}
+
+table {
+    border-collapse: collapse;
+    width: 528px;
+    margin-bottom: 50px;
+    text-align: center;
+}
