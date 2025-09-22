@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Панель мастера{% endblock %}
+
+{% block content %}
+<div>
+    <h1>Панель мастера</h1>
+    
+    <div>
+        <div>
+            <h3>Информация о сотруднике</h3>
+            <div>
+                <p><strong>Имя:</strong> {{ employee.user.first_name }} {{ employee.user.last_name }}</p>
+                <p><strong>Должность:</strong> {{ employee.get_position_display }}</p>
+                <p><strong>Телефон:</strong> {{ employee.phone_number|default:"Не указан" }}</p>
+                <p><strong>Дата трудоустройства:</strong> {{ employee.hire_date|date:"d.m.Y" }}</p>
+            </div>
+        </div>
+        
+        <div>
+            <h3>Статистика</h3>
+            <div>
+                <p><strong>Активных заказов:</strong> {{ active_orders.count }}</p>
+                <p><strong>Записей в расписании:</strong> {{ schedule.count }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div>
+        <div>
+            <h3>Расписание</h3>
+            <div>
+                {% if schedule %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Дата</th>
+                                <th>Время</th>
+                                <th>Клиент</th>
+                                <th>Услуга</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appointment in schedule %}
+                            <tr>
+                                <td>{{ appointment.date|date:"d.m.Y" }}</td>
+                                <td>{{ appointment.time_start }} - {{ appointment.time_end }}</td>
+                                <td>{{ appointment.client.user.first_name }} {{ appointment.client.user.last_name }}</td>
+                                <td>{{ appointment.service.name }}</td>
+                                <td>{{ appointment.get_status_display }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>Расписание пустое</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div>
+        <div>
+            <h3>Заказы в работе</h3>
+            <div>
+                {% if active_orders %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>№ заказа</th>
+                                <th>Клиент</th>
+                                <th>Услуга</th>
+                                <th>Статус</th>
+                                <th>Сумма</th>
+                                <th>Дата создания</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in active_orders %}
+                            <tr>
+                                <td>{{ order.id }}</td>
+                                <td>{{ order.contract.client.user.first_name }} {{ order.contract.client.user.last_name }}</td>
+                                <td>{{ order.service.name }}</td>
+                                <td>{{ order.get_status_display }}</td>
+                                <td>{{ order.total_sum|default:"Не указана" }} руб.</td>
+                                <td>{{ order.date_created|date:"d.m.Y H:i" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>Нет активных заказов</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

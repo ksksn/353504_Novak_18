@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Часто задаваемые вопросы{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Часто задаваемые вопросы</h1>
+    
+    <div class="accordion" id="faqAccordion">
+        {% for term in terms %}
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="heading{{ term.id }}">
+                <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button" 
+                        data-bs-toggle="collapse" data-bs-target="#collapse{{ term.id }}" 
+                        aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" 
+                        aria-controls="collapse{{ term.id }}">
+                    {{ term.question }}
+                </button>
+            </h2>
+            <div id="collapse{{ term.id }}" 
+                 class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" 
+                 aria-labelledby="heading{{ term.id }}" 
+                 data-bs-parent="#faqAccordion">
+                <div class="accordion-body">
+                    {{ term.answer|linebreaks }}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="alert alert-info">
+            В данный момент нет доступных вопросов и ответов.
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="mt-4">
+        <a href="{% url 'main:index' %}" class="btn btn-secondary">Назад на главную</a>
+    </div>
+</div>
+{% endblock %} 

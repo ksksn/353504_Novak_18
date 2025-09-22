@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div>
+    <div>
+        <h1>Часто задаваемые вопросы</h1>
+        <p>Ответы на самые популярные вопросы о наших услугах</p>
+        
+        <div>
+            <p>Всего вопросов: {{ faq_by_category|length }}</p>
+        </div>
+    </div>
+
+    {% if faq_by_category %}
+        <div>
+            <div>
+                <h2>Категории</h2>
+                <ul>
+                    {% for category, questions in faq_by_category.items %}
+                    <li><a href="#category-{{ forloop.counter }}">{{ category }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div>
+                {% for category, questions in faq_by_category.items %}
+                    <div id="category-{{ forloop.counter }}">
+                        <h2>{{ category }}</h2>
+                        <p>Вопросов в категории: {{ questions|length }}</p>
+
+                        <div>
+                            {% for faq in questions %}
+                            <details>
+                                <summary><strong>{{ faq.question }}</strong></summary>
+                                <div>{{ faq.answer|safe }}</div>
+                            </details>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div>
+            <h3>Пока нет вопросов</h3>
+            <p>FAQ пополняется по мере поступления вопросов от клиентов</p>
+        </div>
+    {% endif %}
+
+    <div>
+        <h2>Не нашли ответ на свой вопрос?</h2>
+        <p>Свяжитесь с нами любым удобным способом, и мы обязательно поможем!</p>
+        <div>
+            <a href="{% url 'main:contacts' %}">Контакты</a>
+            <span>Телефон: +375 44 764-02-03</span>
+            <span>Email: okak@serviceby.by</span>
+        </div>
+    </div>
+</div>
+{% endblock %}

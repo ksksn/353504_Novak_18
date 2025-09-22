@@ -1,0 +1,50 @@
+{% extends "admin/base_site.html" %}
+{% load admin_urls static %}
+
+{% block title %}Месячный отчет {{ month }}/{{ year }}{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <h1>Отчет за {{ month }}/{{ year }}</h1>
+    
+    <div class="module">
+        <h2>Общая статистика</h2>
+        <table>
+            <tr>
+                <td><strong>Количество ремонтов:</strong></td>
+                <td>{{ repairs_count }}</td>
+            </tr>
+            <tr>
+                <td><strong>Завершено ремонтов:</strong></td>
+                <td>{{ completed_repairs }}</td>
+            </tr>
+            <tr>
+                <td><strong>Выручка от ремонтов:</strong></td>
+                <td>{{ repairs_total|floatformat:2 }} руб.</td>
+            </tr>
+            <tr>
+                <td><strong>Количество договоров:</strong></td>
+                <td>{{ contracts_count }}</td>
+            </tr>
+            <tr>
+                <td><strong>Сумма по договорам:</strong></td>
+                <td>{{ contracts_total|floatformat:2 }} руб.</td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="submit-row">
+        <a href="{% url 'admin:index' %}" class="default">Назад в админ-панель</a>
+        <button onclick="window.print()" class="default">Печать отчета</button>
+    </div>
+</div>
+
+<style>
+@media print {
+    .submit-row { display: none; }
+    .breadcrumbs { display: none; }
+    #header { display: none; }
+    #nav-sidebar { display: none; }
+}
+</style>
+{% endblock %}

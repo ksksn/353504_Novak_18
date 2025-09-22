@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Статистика{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Статистика системы</h1>
+    <p class="text-muted">Данные на {{ current_date }}</p>
+    
+    {% if user_type == 'employee' and employee %}
+        <div class="alert alert-info">
+            <strong>Сотрудник:</strong> {{ employee.user.get_full_name|default:employee.user.username }}
+            <br><strong>Должность:</strong> {{ employee.get_position_display }}
+        </div>
+    {% elif user_type == 'admin' %}
+        <div class="alert alert-success">
+            <strong>Администратор:</strong> {{ user.get_full_name|default:user.username }}
+        </div>
+    {% endif %}
+    
+    <!-- Общая статистика -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Всего заявок</h5>
+                    <h2 class="display-4">{{ total_requests }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Всего услуг</h5>
+                    <h2 class="display-4">{{ total_services }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Всего клиентов</h5>
+                    <h2 class="display-4">{{ total_clients }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Всего сотрудников</h5>
+                    <h2 class="display-4">{{ total_employees }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Графики -->
+    <div class="row">
+        <!-- График заявок по месяцам -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Заявки по месяцам</h5>
+                    <img src="data:image/png;base64,{{ monthly_chart }}" class="img-fluid" alt="График заявок по месяцам">
+                </div>
+            </div>
+        </div>
+        
+        <!-- График топ-5 услуг -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Топ-5 популярных услуг</h5>
+                    <img src="data:image/png;base64,{{ services_chart }}" class="img-fluid" alt="График популярных услуг">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Круговая диаграмма статусов -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Распределение заявок по статусам</h5>
+                    <img src="data:image/png;base64,{{ status_chart }}" class="img-fluid" alt="Диаграмма статусов">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-4">
+        <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">Назад к профилю</a>
+        {% if user_type == 'admin' %}
+            <a href="/admin/" class="btn btn-primary">Админ панель</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

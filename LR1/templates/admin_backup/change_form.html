@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }} | Админка</title>
+</head>
+<body>
+    <header>
+        <h1>Административная панель сервисного центра</h1>
+        <div>
+            <span>ДОБРО ПОЖАЛОВАТЬ, {{ user.username|upper }}.</span>
+            <a href="/">ОТКРЫТЬ САЙТ</a> /
+            <a href="/admin/password_change/">ИЗМЕНИТЬ ПАРОЛЬ</a> /
+            <a href="/admin/logout/">ВЫЙТИ</a>
+        </div>
+        <nav>
+            <a href="/admin/">Главная</a> &gt; 
+            <a href="/admin/{{ opts.app_label }}/">{{ opts.app_label|title }}</a> &gt; 
+            <a href="/admin/{{ opts.app_label }}/{{ opts.model_name }}/">{{ opts.verbose_name_plural|title }}</a> &gt;
+            {% if add %}Добавить{% else %}Изменить{% endif %}
+        </nav>
+    </header>
+
+    <main>
+        <h2>{% if add %}Добавить {{ opts.verbose_name }}{% else %}Изменить {{ opts.verbose_name }}: {{ original }}{% endif %}</h2>
+
+        {% if errors %}
+        <div>
+            <h3>Ошибки:</h3>
+            <ul>
+                {% for error in errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            
+            <table>
+                {% for fieldset in adminform %}
+                    {% for line in fieldset %}
+                        {% for field in line %}
+                        <tr>
+                            <td>{{ field.field.label_tag }}</td>
+                            <td>
+                                {{ field.field }}
+                                {% if field.field.help_text %}
+                                <br><small>{{ field.field.help_text }}</small>
+                                {% endif %}
+                                {% if field.field.errors %}
+                                <br><span style="color: red;">{{ field.field.errors }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% endfor %}
+                {% endfor %}
+            </table>
+
+            <div>
+                <input type="submit" value="Сохранить">
+                <input type="submit" name="_continue" value="Сохранить и продолжить редактирование">
+                <input type="submit" name="_addanother" value="Сохранить и добавить другой объект">
+                <a href="../">Отмена</a>
+            </div>
+        </form>
+
+        {% if not add %}
+        <div>
+            <a href="delete/">Удалить</a>
+        </div>
+        {% endif %}
+    </main>
+</body>
+</html>

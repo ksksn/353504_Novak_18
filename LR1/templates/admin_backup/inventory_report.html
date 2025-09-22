@@ -1,0 +1,84 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+{% load report_extras %}
+
+{% block content %}
+<div>
+    <div>Отчет по инвентаризации запчастей</div>
+    <div>Дата формирования: {{ date_generated|date:"d.m.Y H:i" }}</div>
+</div>
+
+<div>
+    <div>
+        <span>{{ total_parts }}</span>
+        <span>Всего запчастей</span>
+    </div>
+    <div>
+        <span>{{ total_value|floatformat:2 }} руб.</span>
+        <span>Общая стоимость запасов</span>
+    </div>
+    <div>
+        <span>{{ low_stock_count }}</span>
+        <span>Запчастей заканчивается</span>
+    </div>
+    <div>
+        <span>{{ out_of_stock_count }}</span>
+        <span>Запчастей нет в наличии</span>
+    </div>
+</div>
+
+<div>
+    <label for="stock-filter">Фильтр по наличию:</label>
+    <select id="stock-filter">
+        <option value="all">Все запчасти</option>
+        <option value="out">Нет в наличии</option>
+        <option value="low">Заканчиваются</option>
+        <option value="ok">Достаточный запас</option>
+    </select>
+</div>
+
+{% regroup parts by category as category_list %}
+
+{% for category in category_list %}
+<div>
+    <div>Категория: {{ category.grouper }}</div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Цена</th>
+                <th>Количество</th>
+                <th>Общая стоимость</th>
+                <th>Статус</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for part in category.list %}
+            <tr data-quantity="{{ part.quantity_in_stock }}">
+                <td>{{ part.name }}</td>
+                <td>{{ part.price|floatformat:2 }} руб.</td>
+                <td>{{ part.quantity_in_stock }}</td>
+                <td>{{ part.price|multiply:part.quantity_in_stock|floatformat:2 }} руб.</td>
+                <td>
+                    {% if part.quantity_in_stock == 0 %}
+                    <span>Нет в наличии</span>
+                    {% elif part.quantity_in_stock < 5 %}
+                    <span>Заканчивается ({{ part.quantity_in_stock }})</span>
+                    {% else %}
+                    <span>В наличии ({{ part.quantity_in_stock }})</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endfor %}
+
+<div>
+    <button onclick="window.print()">Печать отчета</button>
+    <button onclick="window.history.back()">Вернуться назад</button>
+</div>
+
+{% endblock %}

@@ -1,0 +1,238 @@
+{% extends 'admin_custom/base.html' %}
+
+{% block page_title %}Запчасти{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'admin_custom:add_spare_part' %}">
+    Добавить запчасть
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Фильтры и поиск -->
+<div>
+    <div>
+        <form method="GET">
+            <div>
+                <label>Поиск</label>
+                <input type="text" name="search" 
+                       value="{{ search_query }}" placeholder="Название запчасти...">
+            </div>
+            <div>
+                <label>Категория</label>
+                <select name="category">
+                    <option value="">Все категории</option>
+                    {% for category in categories %}
+                    <option value="{{ category }}" {% if current_category == category %}selected{% endif %}>
+                        {{ category }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Наличие на складе</label>
+                <select name="stock">
+                    <option value="">Все</option>
+                    <option value="in_stock" {% if current_stock == 'in_stock' %}selected{% endif %}>В наличии</option>
+                    <option value="low_stock" {% if current_stock == 'low_stock' %}selected{% endif %}>Мало (< 5)</option>
+                    <option value="out_of_stock" {% if current_stock == 'out_of_stock' %}selected{% endif %}>Нет в наличии</option>
+                </select>
+            </div>
+            <div>
+                <button type="submit">
+                    Поиск
+                </button>
+                <a href="{% url 'admin_custom:spare_parts_list' %}">
+                    Сброс
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Список запчастей -->
+<div>
+    <div>
+        <h6>
+            Список запчастей 
+            <span>{{ spare_parts.paginator.count }}</span>
+        </h6>
+    </div>
+    <div>
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Название</th>
+                        <th>Категория</th>
+                        <th>Цена</th>
+                        <th>На складе</th>
+                        <th>Статус</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for part in spare_parts %}
+                    <tr>
+                        <td>
+                            <div>
+                                <div>
+                                    <h6>{{ part.name }}</h6>
+                                    {% if part.description %}
+                                        <small>{{ part.description|truncatechars:40 }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span>{{ part.category }}</span>
+                        </td>
+                        <td>
+                            <span>{{ part.price|floatformat:2 }} ₽</span>
+                        </td>
+                        <td>
+                            <span>{{ part.quantity_in_stock }}</span>
+                        </td>
+                        <td>
+                            {% if part.quantity_in_stock == 0 %}
+                                <span>Нет в наличии</span>
+                            {% elif part.quantity_in_stock < 5 %}
+                                <span>Мало</span>
+                            {% else %}
+                                <span>В наличии</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'admin_custom:edit_spare_part' part.id %}" 
+                               title="Редактировать">
+                                Редактировать
+                            </a>
+                            <button onclick="deleteSparePart({{ part.id }})" title="Удалить">
+                                Удалить
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">
+                            <h5>Запчасти не найдены</h5>
+                            <p>{% if search_query or current_category or current_stock %}По заданным критериям ничего не найдено{% else %}Пока нет запчастей в каталоге{% endif %}</p>
+                            <a href="{% url 'admin_custom:add_spare_part' %}">
+                                Добавить первую запчасть
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Пагинация -->
+        {% if spare_parts.has_other_pages %}
+        <nav>
+            <ul>
+                {% if spare_parts.has_previous %}
+                    <li>
+                        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}{% if current_stock %}stock={{ current_stock }}&{% endif %}page={{ spare_parts.previous_page_number }}">
+                            Предыдущая
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% for num in spare_parts.paginator.page_range %}
+                    {% if spare_parts.number == num %}
+                        <li>
+                            <span>{{ num }}</span>
+                        </li>
+                    {% elif num > spare_parts.number|add:'-3' and num < spare_parts.number|add:'3' %}
+                        <li>
+                            <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}{% if current_stock %}stock={{ current_stock }}&{% endif %}page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if spare_parts.has_next %}
+                    <li>
+                        <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if current_category %}category={{ current_category }}&{% endif %}{% if current_stock %}stock={{ current_stock }}&{% endif %}page={{ spare_parts.next_page_number }}">
+                            Следующая
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Модальные окна для редактирования -->
+{% for part in spare_parts %}
+<!-- Модальное окно редактирования -->
+<div id="editPartModal{{ part.id }}">
+    <div>
+        <div>
+            <div>
+                <h5>Редактировать: {{ part.name }}</h5>
+                <button type="button">×</button>
+            </div>
+            <form method="POST" action="{% url 'admin_custom:spare_parts_list' %}">
+                <div>
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="edit">
+                    <input type="hidden" name="part_id" value="{{ part.id }}">
+                    
+                    <div>
+                        <label>Название</label>
+                        <input type="text" name="name" value="{{ part.name }}" required>
+                    </div>
+                    <div>
+                        <label>Категория</label>
+                        <input type="text" name="category" value="{{ part.category }}" required>
+                    </div>
+                    <div>
+                        <label>Цена (₽)</label>
+                        <input type="number" name="price" value="{{ part.price }}" step="0.01" min="0" required>
+                    </div>
+                </div>
+                <div>
+                    <button type="button">Отмена</button>
+                    <button type="submit">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно обновления склада -->
+<div id="stockModal{{ part.id }}">
+    <div>
+        <div>
+            <div>
+                <h5>Обновить склад: {{ part.name }}</h5>
+                <button type="button">×</button>
+            </div>
+            <form method="POST" action="{% url 'admin_custom:spare_parts_list' %}">
+                <div>
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="update_stock">
+                    <input type="hidden" name="part_id" value="{{ part.id }}">
+                    
+                    <div>
+                        Текущее количество на складе: <strong>{{ part.quantity_in_stock }}</strong>
+                    </div>
+                    
+                    <div>
+                        <label>Новое количество</label>
+                        <input type="number" name="quantity" value="{{ part.quantity_in_stock }}" min="0" required>
+                        <div>Установите новое количество на складе</div>
+                    </div>
+                </div>
+                <div>
+                    <button type="button">Отмена</button>
+                    <button type="submit">Обновить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

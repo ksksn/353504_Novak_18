@@ -1,0 +1,184 @@
+{% extends "admin/base_site.html" %}
+{% load admin_static %}
+
+{% block title %}Отчеты и аналитика{% endblock %}
+
+{% block extrahead %}
+<style>
+    .dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+    }
+    
+    .stat-card {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .stat-card h3 {
+        margin: 0 0 10px 0;
+        color: #333;
+        font-size: 16px;
+    }
+    
+    .stat-value {
+        font-size: 24px;
+        font-weight: bold;
+        color: #1a73e8;
+    }
+    
+    .stat-description {
+        color: #666;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+    
+    .reports-section {
+        margin: 30px 0;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+    }
+    
+    .reports-section h2 {
+        margin: 0 0 15px 0;
+        color: #333;
+        border-bottom: 2px solid #1a73e8;
+        padding-bottom: 10px;
+    }
+    
+    .list-item {
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .list-item:last-child {
+        border-bottom: none;
+    }
+    
+    .actions {
+        margin: 20px 0;
+    }
+    
+    .action-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #1a73e8;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        margin-right: 10px;
+        font-size: 14px;
+    }
+    
+    .action-button:hover {
+        background: #1557b0;
+        color: white;
+    }
+    
+    .success { color: #28a745; font-weight: bold; }
+    .warning { color: #ffc107; font-weight: bold; }
+    .danger { color: #dc3545; font-weight: bold; }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<div class="actions">
+    <a href="{% url 'admin:financial_report' %}" class="action-button">Финансовый отчет</a>
+    <a href="{% url 'admin:client_analytics' %}" class="action-button">Аналитика клиентов</a>
+    <a href="{% url 'admin:parts_analytics' %}" class="action-button">Аналитика запчастей</a>
+    <a href="{% url 'admin:export_contracts_csv' %}" class="action-button">Экспорт договоров</a>
+</div>
+
+<div class="dashboard-stats">
+    <div class="stat-card">
+        <h3>Всего договоров</h3>
+        <div class="stat-value">{{ total_contracts }}</div>
+        <div class="stat-description">За все время</div>
+    </div>
+    
+    <div class="stat-card">
+        <h3>Выполнено</h3>
+        <div class="stat-value success">{{ completed_contracts }}</div>
+        <div class="stat-description">{{ completion_rate }}% от общего числа</div>
+    </div>
+    
+    <div class="stat-card">
+        <h3>За этот месяц</h3>
+        <div class="stat-value">{{ contracts_this_month }}</div>
+        <div class="stat-description">новых договоров</div>
+    </div>
+    
+    <div class="stat-card">
+        <h3>Общая выручка</h3>
+        <div class="stat-value">{{ total_revenue|floatformat:2 }} руб.</div>
+        <div class="stat-description">от всех договоров</div>
+    </div>
+    
+    <div class="stat-card">
+        <h3>Средний чек</h3>
+        <div class="stat-value">{{ avg_contract_value|floatformat:2 }} руб.</div>
+        <div class="stat-description">на договор</div>
+    </div>
+    
+    <div class="stat-card">
+        <h3>Выручка месяца</h3>
+        <div class="stat-value">{{ revenue_this_month|floatformat:2 }} руб.</div>
+        <div class="stat-description">за текущий месяц</div>
+    </div>
+    
+    <div class="stat-card">
+        <h3>VIP клиенты</h3>
+        <div class="stat-value">{{ vip_clients_count }}</div>
+        <div class="stat-description">премиум клиентов</div>
+    </div>
+    
+    <div class="stat-card">
+        <h3>Низкий остаток</h3>
+        <div class="stat-value warning">{{ low_stock_parts }}</div>
+        <div class="stat-description">запчастей требует пополнения</div>
+    </div>
+</div>
+
+<div class="reports-section">
+    <h2>Популярные услуги</h2>
+    {% for service in most_popular_services %}
+    <div class="list-item">
+        <span>{{ service.name }}</span>
+        <span><strong>{{ service.order_count }}</strong> заказов</span>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="reports-section">
+    <h2>Топ клиенты</h2>
+    {% for client in top_clients %}
+    <div class="list-item">
+        <span>{{ client.user.get_full_name }}</span>
+        <span><strong>{{ client.total_spent|floatformat:2 }} руб.</strong></span>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="reports-section">
+    <h2>Часто используемые запчасти</h2>
+    {% for part in most_used_parts %}
+    <div class="list-item">
+        <span>{{ part.name }}</span>
+        <span><strong>{{ part.usage_count|default:0 }}</strong> раз</span>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

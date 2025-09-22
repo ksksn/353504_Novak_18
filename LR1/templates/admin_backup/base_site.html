@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Административная панель сервисного центра{% endblock %}</title>
+</head>
+<body>
+    <header>
+        <h1>Административная панель сервисного центра</h1>
+        <p>ДОБРО ПОЖАЛОВАТЬ, {{ user.username|upper }}. 
+        <a href="/">ОТКРЫТЬ САЙТ</a> / 
+        <a href="{% url 'admin:password_change' %}">ИЗМЕНИТЬ ПАРОЛЬ</a> / 
+        <a href="{% url 'admin:logout' %}">ВЫЙТИ</a></p>
+    </header>
+
+    <main>
+        {% block content %}
+        <h2>Управление сервисным центром</h2>
+
+        <h3>ДОГОВОРЫ И ЗАКАЗЫ</h3>
+        <table border="1">
+            <tr>
+                <td><a href="{% url 'admin:main_contract_changelist' %}">Договоры</a></td>
+                <td><a href="{% url 'admin:main_contract_add' %}">Добавить</a></td>
+                <td><a href="{% url 'admin:main_contract_changelist' %}">Изменить</a></td>
+            </tr>
+            <tr>
+                <td><a href="{% url 'admin:main_order_changelist' %}">Заказы</a></td>
+                <td><a href="{% url 'admin:main_order_add' %}">Добавить</a></td>
+                <td><a href="{% url 'admin:main_order_changelist' %}">Изменить</a></td>
+            </tr>
+            <tr>
+                <td><a href="{% url 'admin:main_client_changelist' %}">Клиенты</a></td>
+                <td><a href="{% url 'admin:main_client_add' %}">Добавить</a></td>
+                <td><a href="{% url 'admin:main_client_changelist' %}">Изменить</a></td>
+            </tr>
+        </table>
+
+        <h3>РЕМОНТЫ И УСТРОЙСТВА</h3>
+        <table border="1">
+            <tr>
+                <td><a href="{% url 'admin:main_devicetype_changelist' %}">Виды устройств</a></td>
+                <td><a href="{% url 'admin:main_devicetype_add' %}">Добавить</a></td>
+                <td><a href="{% url 'admin:main_devicetype_changelist' %}">Изменить</a></td>
+            </tr>
+            <tr>
+                <td><a href="{% url 'admin:main_repair_changelist' %}">Ремонты</a></td>
+                <td><a href="{% url 'admin:main_repair_add' %}">Добавить</a></td>
+                <td><a href="{% url 'admin:main_repair_changelist' %}">Изменить</a></td>
+            </tr>
+            <tr>
+                <td><a href="{% url 'admin:main_device_changelist' %}">Устройства</a></td>
+                <td><a href="{% url 'admin:main_device_add' %}">Добавить</a></td>
+                <td><a href="{% url 'admin:main_device_changelist' %}">Изменить</a></td>
+            </tr>
+        </table>
+
+        <h3>ЗАПЧАСТИ</h3>
+        <table border="1">
+            <tr>
+                <td><a href="{% url 'admin:main_sparepart_changelist' %}">Запчасти</a></td>
+                <td><a href="{% url 'admin:main_sparepart_add' %}">Добавить</a></td>
+                <td><a href="{% url 'admin:main_sparepart_changelist' %}">Изменить</a></td>
+            </tr>
+        </table>
+
+        <h3>УСЛУГИ И ПЕРСОНАЛ</h3>
+        <table border="1">
+            <tr>
+                <td><a href="{% url 'admin:main_employee_changelist' %}">Сотрудники</a></td>
+                <td><a href="{% url 'admin:main_employee_add' %}">Добавить</a></td>
+                <td><a href="{% url 'admin:main_employee_changelist' %}">Изменить</a></td>
+            </tr>
+            <tr>
+                <td><a href="{% url 'admin:main_employeespecialization_changelist' %}">Специализации</a></td>
+                <td><a href="{% url 'admin:main_employeespecialization_add' %}">Добавить</a></td>
+                <td><a href="{% url 'admin:main_employeespecialization_changelist' %}">Изменить</a></td>
+            </tr>
+            <tr>
+                <td><a href="{% url 'admin:main_servicetype_changelist' %}">Типы услуг</a></td>
+                <td><a href="{% url 'admin:main_servicetype_add' %}">Добавить</a></td>
+                <td><a href="{% url 'admin:main_servicetype_changelist' %}">Изменить</a></td>
+            </tr>
+            <tr>
+                <td><a href="{% url 'admin:main_service_changelist' %}">Услуги</a></td>
+                <td><a href="{% url 'admin:main_service_add' %}">Добавить</a></td>
+                <td><a href="{% url 'admin:main_service_changelist' %}">Изменить</a></td>
+            </tr>
+        </table>
+
+        <h3>ПОЛЬЗОВАТЕЛИ И ГРУППЫ</h3>
+        <table border="1">
+            <tr>
+                <td><a href="{% url 'admin:auth_group_changelist' %}">Группы</a></td>
+                <td><a href="{% url 'admin:auth_group_add' %}">Добавить</a></td>
+                <td><a href="{% url 'admin:auth_group_changelist' %}">Изменить</a></td>
+            </tr>
+            <tr>
+                <td><a href="{% url 'admin:auth_user_changelist' %}">Пользователи</a></td>
+                <td><a href="{% url 'admin:auth_user_add' %}">Добавить</a></td>
+                <td><a href="{% url 'admin:auth_user_changelist' %}">Изменить</a></td>
+            </tr>
+        </table>
+        {% endblock %}
+    </main>
+</body>
+</html>

@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}Руководство по админ-панели{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-book"></i> Руководство по работе с административными панелями
+            </h1>
+        </div>
+    </div>
+
+    <!-- Быстрый доступ -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h4><i class="fas fa-rocket"></i> Быстрый доступ</h4>
+                    <p><strong>Логин:</strong> admin</p>
+                    <p><strong>Пароль:</strong> admin123</p>
+                    <a href="{% url 'main:admin_dashboard' %}" class="btn btn-light">
+                        <i class="fas fa-tachometer-alt"></i> Открыть админ-дашборд
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <h3>Доступные административные панели</h3>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5><i class="fas fa-tachometer-alt"></i> Основная админка</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>URL:</strong> <code>/admin/</code></p>
+                    <p><strong>Назначение:</strong> Полное управление системой сервисного центра</p>
+                    <p><strong>Возможности:</strong></p>
+                    <ul>
+                        <li>Управление договорами и заказами</li>
+                        <li>Работа с клиентами и устройствами</li>
+                        <li>Управление запчастями и услугами</li>
+                        <li>Финансовые отчёты и аналитика</li>
+                        <li>Экспорт данных в CSV</li>
+                        <li>Расширенная фильтрация и поиск</li>
+                    </ul>
+                    <a href="/admin/" class="btn btn-primary">Открыть</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5><i class="fas fa-tools"></i> Мастер-панель</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>URL:</strong> <code>/master/</code></p>
+                    <p><strong>Назначение:</strong> Упрощённая панель для мастеров</p>
+                    <p><strong>Возможности:</strong></p>
+                    <ul>
+                        <li>Просмотр активных ремонтов</li>
+                        <li>Обновление статусов заказов</li>
+                        <li>Добавление использованных запчастей</li>
+                        <li>Простой интерфейс без лишних функций</li>
+                    </ul>
+                    <a href="/master/" class="btn btn-success">Открыть</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5><i class="fas fa-desktop"></i> Кастомная админка</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>URL:</strong> <code>/custom-admin/</code></p>
+                    <p><strong>Назначение:</strong> HTML-интерфейс с пользовательским дизайном</p>
+                    <p><strong>Возможности:</strong></p>
+                    <ul>
+                        <li>Красивый пользовательский интерфейс</li>
+                        <li>Оптимизирован для работы на планшетах</li>
+                        <li>Простая навигация</li>
+                        <li>Быстрый доступ к часто используемым функциям</li>
+                    </ul>
+                    <a href="/custom-admin/" class="btn btn-info">Открыть</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5><i class="fas fa-wrench"></i> Django админка</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>URL:</strong> <code>/django-admin/</code></p>
+                    <p><strong>Назначение:</strong> Стандартная панель Django для отладки</p>
+                    <p><strong>Возможности:</strong></p>
+                    <ul>
+                        <li>Прямой доступ к моделям Django</li>
+                        <li>Отладка и тестирование</li>
+                        <li>Резервный доступ при проблемах с кастомными панелями</li>
+                    </ul>
+                    <a href="/django-admin/" class="btn btn-warning">Открыть</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Отчёты и аналитика -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <h3>Отчёты и аналитика</h3>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6><i class="fas fa-chart-bar"></i> Дашборд отчётов</h6>
+                    <p>Общая аналитика и статистика</p>
+                    <a href="/admin/reports/" class="btn btn-outline-primary">Открыть</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6><i class="fas fa-users"></i> Аналитика клиентов</h6>
+                    <p>Статистика по клиентам и их активности</p>
+                    <a href="/admin/reports/clients/" class="btn btn-outline-primary">Открыть</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h6><i class="fas fa-download"></i> Экспорт данных</h6>
+                    <p>Выгрузка договоров в CSV формате</p>
+                    <a href="/admin/reports/export-contracts/" class="btn btn-outline-primary">Скачать CSV</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Инструкции -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-info-circle"></i> Основные функции системы</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Управление договорами</h6>
+                            <ul>
+                                <li>Создание новых договоров</li>
+                                <li>Автоматический расчёт сумм</li>
+                                <li>Отслеживание статусов</li>
+                                <li>Связывание с заказами</li>
+                            </ul>
+                            
+                            <h6>Работа с клиентами</h6>
+                            <ul>
+                                <li>Добавление новых клиентов</li>
+                                <li>Управление устройствами клиентов</li>
+                                <li>История обращений</li>
+                                <li>Контактная информация</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Управление запчастями</h6>
+                            <ul>
+                                <li>Учёт остатков на складе</li>
+                                <li>Отслеживание использования</li>
+                                <li>Контроль цен</li>
+                                <li>Категории и типы запчастей</li>
+                            </ul>
+                            
+                            <h6>Отчётность</h6>
+                            <ul>
+                                <li>Финансовые отчёты</li>
+                                <li>Статистика по клиентам</li>
+                                <li>Аналитика продаж</li>
+                                <li>Экспорт в Excel/CSV</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

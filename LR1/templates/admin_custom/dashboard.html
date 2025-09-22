@@ -1,0 +1,307 @@
+{% extends 'admin_custom/base.html' %}
+
+{% block extra_css %}
+<style>
+    /* Специальные стили для dashboard */
+    .dashboard-header {
+        background: linear-gradient(135deg, var(--secondary-blue), var(--light-blue));
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 25px rgba(168, 200, 232, 0.2);
+        border: 1px solid var(--soft-gray);
+    }
+
+    .dashboard-header h1 {
+        color: var(--text-dark);
+        text-shadow: 0 2px 4px rgba(168, 200, 232, 0.3);
+    }
+
+    .stats-card {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stats-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-blue), var(--secondary-blue));
+    }
+
+    .stats-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        text-shadow: 0 2px 4px rgba(168, 200, 232, 0.2);
+    }
+
+    .stats-label {
+        color: var(--dark-gray);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .stats-icon {
+        color: var(--primary-blue) !important;
+        opacity: 0.8;
+    }
+
+    .recent-repairs-table {
+        background: var(--white);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 6px 20px rgba(168, 200, 232, 0.1);
+    }
+
+    .quick-actions-card {
+        background: linear-gradient(135deg, var(--light-blue), var(--white));
+        border: 2px solid var(--soft-gray);
+        border-radius: 15px;
+    }
+
+    .quick-action-btn {
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(168, 200, 232, 0.15);
+    }
+
+    .quick-action-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(168, 200, 232, 0.3);
+    }
+
+    .popular-parts-item {
+        background: var(--white);
+        border: 2px solid var(--soft-gray);
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .popular-parts-item::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(180deg, var(--primary-blue), var(--secondary-blue));
+        border-radius: 10px 0 0 10px;
+    }
+
+    .popular-parts-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 6px 15px rgba(168, 200, 232, 0.2);
+        border-color: var(--primary-blue);
+    }
+</style>
+{% endblock %}
+
+{% block title %}Панель управления - Админ-панель{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1 class="mb-0"><i class="fas fa-tachometer-alt"></i> Панель управления</h1>
+    <p class="mb-0 mt-2 text-muted">Добро пожаловать в систему управления сервисным центром</p>
+</div>
+
+<!-- Статистические карточки -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card border-left-primary">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="stats-label mb-1">
+                            Всего ремонтов
+                        </div>
+                        <div class="stats-value">{{ total_repairs }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-wrench fa-2x stats-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="stats-label mb-1">
+                            В работе
+                        </div>
+                        <div class="stats-value">{{ active_repairs }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clock fa-2x stats-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="stats-label mb-1">
+                            Завершено
+                        </div>
+                        <div class="stats-value">{{ completed_repairs }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-check fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card border-left-info">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Доход
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">${{ total_revenue|floatformat:2 }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Последние ремонты -->
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">Последние ремонты</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Клиент</th>
+                                <th>Устройство</th>
+                                <th>Статус</th>
+                                <th>Стоимость</th>
+                                <th>Дата</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for repair in recent_repairs %}
+                            <tr>
+                                <td>{{ repair.id }}</td>
+                                <td>{{ repair.client.user.first_name }} {{ repair.client.user.last_name }}</td>
+                                <td>{{ repair.device.name }}</td>
+                                <td>
+                                    <span class="badge bg-{% if repair.status == 'completed' %}success{% elif repair.status == 'in_progress' %}warning{% else %}secondary{% endif %}">
+                                        {{ repair.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>${{ repair.total_cost|floatformat:2 }}</td>
+                                <td>{{ repair.created_at|date:"d.m.Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center">Нет ремонтов</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Статистика и популярные запчасти -->
+    <div class="col-lg-4">
+        <!-- Статистика по статусам -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">Статистика по статусам</h6>
+            </div>
+            <div class="card-body">
+                {% for stat in status_stats %}
+                <div class="d-flex justify-content-between mb-2">
+                    <span>{{ stat.status }}</span>
+                    <span class="badge bg-primary">{{ stat.count }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Популярные запчасти -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">Популярные запчасти</h6>
+            </div>
+            <div class="card-body">
+                {% for part in popular_parts %}
+                <div class="d-flex justify-content-between mb-2">
+                    <span>{{ part.name }}</span>
+                    <span class="badge bg-success">{{ part.usage_count }}</span>
+                </div>
+                {% empty %}
+                <p class="text-muted">Нет данных</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Быстрые действия -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">Быстрые действия</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'admin_custom:repair_add' %}" class="btn btn-primary btn-block">
+                            <i class="fas fa-plus"></i> Новый ремонт
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'admin_custom:client_add' %}" class="btn btn-success btn-block">
+                            <i class="fas fa-user-plus"></i> Новый клиент
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'admin_custom:device_add' %}" class="btn btn-info btn-block">
+                            <i class="fas fa-mobile-alt"></i> Новое устройство
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'admin_custom:reports' %}" class="btn btn-warning btn-block">
+                            <i class="fas fa-chart-bar"></i> Отчеты
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

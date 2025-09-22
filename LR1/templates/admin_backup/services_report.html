@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Отчет по услугам</title>
+</head>
+<body>
+    <h1>Отчет по услугам</h1>
+    <p>Дата формирования: {{ date_generated|date:"d.m.Y H:i" }}</p>
+
+    <div>
+        <p><strong>Всего услуг в отчете:</strong> {{ total_services }}</p>
+        <p><strong>Общая выручка:</strong> {{ total_revenue|floatformat:2 }} руб.</p>
+    </div>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Название услуги</th>
+                <th>Категория</th>
+                <th>Цена</th>
+                <th>Количество заказов</th>
+                <th>Выручка</th>
+                <th>Статус</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in service_data %}
+            <tr>
+                <td>{{ item.service.name }}</td>
+                <td>{{ item.service.service_type }}</td>
+                <td>{{ item.service.price|floatformat:2 }} руб.</td>
+                <td>{{ item.orders_count }}</td>
+                <td>{{ item.revenue|floatformat:2 }} руб.</td>
+                <td>
+                    {% if item.service.is_active %}Активна{% else %}Неактивна{% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">Услуги не найдены</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="4"><strong>Итого:</strong></td>
+                <td><strong>{{ total_revenue|floatformat:2 }} руб.</strong></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div>
+        <button onclick="window.print()">Печать отчета</button>
+        <button onclick="window.history.back()">Вернуться назад</button>
+    </div>
+</body>
+</html>

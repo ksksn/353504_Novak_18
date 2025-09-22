@@ -1,0 +1,64 @@
+{% extends 'base_simple.html' %}
+
+{% block title %}Услуги{% endblock %}
+
+{% block content %}
+<h1>Услуги</h1>
+
+<form method="get">
+    <p>
+        Категория: 
+        <select name="category">
+            <option value="">Все</option>
+            {% for type in service_types %}
+                <option value="{{ type.id }}" {% if type.id|stringformat:"s" == current_category %}selected{% endif %}>
+                    {{ type.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </p>
+    
+    <p>
+        От: <input type="number" name="min_price" value="{{ current_min_price }}" placeholder="0">
+        До: <input type="number" name="max_price" value="{{ current_max_price }}" placeholder="1000">
+    </p>
+    
+    <p>
+        <button type="submit">Фильтр</button>
+        <a href="{% url 'main:service_list' %}">Сброс</a>
+    </p>
+</form>
+
+<hr>
+
+{% if services %}
+    {% for service in services %}
+        <div>
+            <h3>{{ service.name }}</h3>
+            <p>{{ service.description }}</p>
+            <p>Цена: {{ service.price }} BYN</p>
+            {% if service.service_type %}
+                <p>Категория: {{ service.service_type.name }}</p>
+            {% endif %}
+            
+            {% if user.is_authenticated %}
+                <form method="post" action="{% url 'main:add_to_cart' service.id %}">
+                    {% csrf_token %}
+                    <p>
+                        Количество: 
+                        <input type="number" name="quantity" value="1" min="1" max="10">
+                        <input type="submit" value="Добавить в корзину">
+                    </p>
+                </form>
+            {% else %}
+                <p><a href="{% url 'admin:login' %}">Войдите</a> для добавления в корзину</p>
+            {% endif %}
+            
+            <hr>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>Услуги не найдены</p>
+{% endif %}
+
+{% endblock %}

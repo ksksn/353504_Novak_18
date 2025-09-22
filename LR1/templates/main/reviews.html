@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Отзывы{% endblock %}
+
+{% block content %}
+<div>
+    <h1>Отзывы наших клиентов</h1>
+    
+    {% if user.is_authenticated %}
+        <div>
+            <a href="{% url 'main:add_review' %}">Оставить отзыв</a>
+        </div>
+    {% else %}
+        <div>
+            <p>Чтобы оставить отзыв, необходимо 
+                <a href="{% url 'accounts:login' %}">войти в систему</a> или 
+                <a href="{% url 'accounts:register' %}">зарегистрироваться</a>
+            </p>
+        </div>
+    {% endif %}
+    
+    <div>
+        {% if reviews %}
+            {% for review in reviews %}
+                <div>
+                    <div>
+                        <div>
+                            <h4>{{ review.client.user.first_name }} {{ review.client.user.last_name }}</h4>
+                            <div>
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}
+                                        ★
+                                    {% else %}
+                                        ☆
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <p>{{ review.text }}</p>
+                        {% if review.service %}
+                            <p>Услуга: {{ review.service.name }}</p>
+                        {% endif %}
+                        <p>{{ review.created_at|date:"d.m.Y" }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div>
+                <p>Отзывы пока отсутствуют. Будьте первым!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

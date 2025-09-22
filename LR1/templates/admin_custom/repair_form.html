@@ -1,0 +1,368 @@
+{% extends 'admin_custom/base.html' %}
+
+{% block title %}{% if repair %}Редактирование ремонта #{{ repair.id }}{% else %}Создание ремонта{% endif %} - Админ-панель{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>
+        <i class="fas fa-wrench"></i> 
+        {% if repair %}Ремонт #{{ repair.id }}{% else %}Создание ремонта{% endif %}
+    </h1>
+    <a href="{% url 'admin_custom:repairs_list' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Назад к списку
+    </a>
+</div>
+
+<form method="POST" id="repairForm">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Основная информация -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="m-0">Основная информация</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="client" class="form-label">Клиент <span class="text-danger">*</span></label>
+                                <select class="form-select" id="client" name="client" required onchange="loadClientDevices()">
+                                    <option value="">Выберите клиента</option>
+                                    {% for client in clients %}
+                                        <option value="{{ client.id }}" 
+                                                {% if repair and repair.client.id == client.id %}selected{% endif %}>
+                                            {{ client.user.get_full_name }} ({{ client.user.email }})
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="device" class="form-label">Устройство <span class="text-danger">*</span></label>
+                                <select class="form-select" id="device" name="device" required>
+                                    <option value="">Сначала выберите клиента</option>
+                                    {% if repair %}
+                                        <option value="{{ repair.device.id }}" selected>
+                                            {{ repair.device.name }} ({{ repair.device.serial_number }})
+                                        </option>
+                                    {% endif %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="problem_description" class="form-label">Описание проблемы <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="problem_description" name="problem_description" rows="3" required 
+                                  placeholder="Подробно опишите проблему с устройством">{% if repair %}{{ repair.problem_description }}{% endif %}</textarea>
+                    </div>
+
+                    {% if repair %}
+                    <div class="mb-3">
+                        <label for="diagnosis" class="form-label">Диагноз</label>
+                        <textarea class="form-control" id="diagnosis" name="diagnosis" rows="3"
+                                  placeholder="Результат диагностики">{{ repair.diagnosis }}</textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="status" class="form-label">Статус</label>
+                                <select class="form-select" id="status" name="status">
+                                    <option value="received" {% if repair.status == 'received' %}selected{% endif %}>Принят</option>
+                                    <option value="diagnosed" {% if repair.status == 'diagnosed' %}selected{% endif %}>Диагностирован</option>
+                                    <option value="in_progress" {% if repair.status == 'in_progress' %}selected{% endif %}>В работе</option>
+                                    <option value="waiting_parts" {% if repair.status == 'waiting_parts' %}selected{% endif %}>Ожидание запчастей</option>
+                                    <option value="completed" {% if repair.status == 'completed' %}selected{% endif %}>Завершен</option>
+                                    <option value="cancelled" {% if repair.status == 'cancelled' %}selected{% endif %}>Отменен</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="assigned_employee" class="form-label">Назначенный мастер</label>
+                                <select class="form-select" id="assigned_employee" name="assigned_employee">
+                                    <option value="">Не назначен</option>
+                                    {% for employee in employees %}
+                                        <option value="{{ employee.id }}" 
+                                                {% if repair.assigned_employee and repair.assigned_employee.id == employee.id %}selected{% endif %}>
+                                            {{ employee.user.get_full_name }} - {{ employee.position }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if repair %}
+            <!-- Запчасти -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="m-0">Использованные запчасти</h6>
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="addSparePart()">
+                        <i class="fas fa-plus"></i> Добавить запчасть
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="spareParts">
+                        {% for repair_part in repair_spareparts %}
+                        <div class="spare-part-row mb-3">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <select class="form-select" name="sparepart_id[]" onchange="updatePartPrice(this)">
+                                        <option value="">Выберите запчасть</option>
+                                        {% for part in spareparts %}
+                                            <option value="{{ part.id }}" data-price="{{ part.price }}" 
+                                                    {% if part.id == repair_part.spare_part.id %}selected{% endif %}>
+                                                {{ part.name }} - {{ part.price }} ₽ ({{ part.quantity_in_stock }} шт.)
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="number" class="form-control" name="quantity[]" 
+                                           value="{{ repair_part.quantity }}" min="1" 
+                                           placeholder="Кол-во" onchange="calculateTotal()">
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-control-plaintext part-subtotal">
+                                        {{ repair_part.spare_part.price|floatformat:2 }} ₽
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSparePart(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <strong>Стоимость запчастей:</strong>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <strong id="partsTotal">0.00 ₽</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Стоимость работ -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="m-0">Стоимость и оплата</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="work_cost" class="form-label">Стоимость работ</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="work_cost" name="work_cost" 
+                                           value="{% if repair %}{{ repair.work_cost }}{% else %}0{% endif %}" 
+                                           step="0.01" min="0" onchange="calculateTotal()">
+                                    <span class="input-group-text">₽</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Общая стоимость</label>
+                                <div class="form-control-plaintext">
+                                    <h4 class="text-success mb-0" id="totalCost">
+                                        {% if repair %}{{ repair.total_cost }}{% else %}0.00{% endif %} ₽
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="d-flex justify-content-between">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-save"></i> 
+                    {% if repair %}Сохранить изменения{% else %}Создать ремонт{% endif %}
+                </button>
+                <a href="{% url 'admin_custom:repairs_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times"></i> Отмена
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            {% if repair %}
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="m-0">Информация о ремонте</h6>
+                </div>
+                <div class="card-body">
+                    <p><strong>Номер:</strong> #{{ repair.id }}</p>
+                    <p><strong>Дата создания:</strong> {{ repair.created_at|date:"d.m.Y H:i" }}</p>
+                    <p><strong>Последнее обновление:</strong> {{ repair.updated_at|date:"d.m.Y H:i" }}</p>
+                    <p><strong>Текущий статус:</strong> 
+                        {% if repair.status == 'received' %}
+                            <span class="badge bg-primary">Принят</span>
+                        {% elif repair.status == 'diagnosed' %}
+                            <span class="badge bg-info">Диагностирован</span>
+                        {% elif repair.status == 'in_progress' %}
+                            <span class="badge bg-warning">В работе</span>
+                        {% elif repair.status == 'waiting_parts' %}
+                            <span class="badge bg-secondary">Ожидание запчастей</span>
+                        {% elif repair.status == 'completed' %}
+                            <span class="badge bg-success">Завершен</span>
+                        {% elif repair.status == 'cancelled' %}
+                            <span class="badge bg-danger">Отменен</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="m-0">Справка</h6>
+                </div>
+                <div class="card-body">
+                    <p><small><strong>Автоматический расчет:</strong> При выборе запчастей стоимость рассчитывается автоматически.</small></p>
+                    <p><small><strong>Общая стоимость:</strong> Сумма стоимости работ и всех запчастей.</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- Шаблон для новой запчасти -->
+<template id="sparePartTemplate">
+    <div class="spare-part-row mb-3">
+        <div class="row">
+            <div class="col-md-6">
+                <select class="form-select" name="sparepart_id[]" onchange="updatePartPrice(this)">
+                    <option value="">Выберите запчасть</option>
+                    {% for part in spareparts %}
+                        <option value="{{ part.id }}" data-price="{{ part.price }}">
+                            {{ part.name }} - {{ part.price }} ₽ ({{ part.quantity_in_stock }} шт.)
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <input type="number" class="form-control" name="quantity[]" value="1" min="1" 
+                       placeholder="Кол-во" onchange="calculateTotal()">
+            </div>
+            <div class="col-md-2">
+                <div class="form-control-plaintext part-subtotal">0.00 ₽</div>
+            </div>
+            <div class="col-md-1">
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSparePart(this)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</template>
+
+{% block extra_js %}
+<script>
+function loadClientDevices() {
+    const clientId = document.getElementById('client').value;
+    const deviceSelect = document.getElementById('device');
+    
+    deviceSelect.innerHTML = '<option value="">Загрузка...</option>';
+    
+    if (clientId) {
+        fetch(`/custom-admin/api/client/${clientId}/devices/`)
+            .then(response => response.json())
+            .then(data => {
+                deviceSelect.innerHTML = '<option value="">Выберите устройство</option>';
+                data.devices.forEach(device => {
+                    const option = document.createElement('option');
+                    option.value = device.id;
+                    option.textContent = `${device.name} (${device.serial_number || 'Без серийного номера'})`;
+                    deviceSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки устройств:', error);
+                deviceSelect.innerHTML = '<option value="">Ошибка загрузки</option>';
+            });
+    } else {
+        deviceSelect.innerHTML = '<option value="">Сначала выберите клиента</option>';
+    }
+}
+
+function addSparePart() {
+    const template = document.getElementById('sparePartTemplate');
+    const clone = template.content.cloneNode(true);
+    document.getElementById('spareParts').appendChild(clone);
+}
+
+function removeSparePart(button) {
+    button.closest('.spare-part-row').remove();
+    calculateTotal();
+}
+
+function updatePartPrice(select) {
+    const selectedOption = select.options[select.selectedIndex];
+    const price = selectedOption.dataset.price || 0;
+    const row = select.closest('.spare-part-row');
+    const quantityInput = row.querySelector('input[name="quantity[]"]');
+    const subtotalDiv = row.querySelector('.part-subtotal');
+    
+    const quantity = quantityInput.value || 1;
+    const subtotal = (price * quantity).toFixed(2);
+    subtotalDiv.textContent = `${subtotal} ₽`;
+    
+    calculateTotal();
+}
+
+function calculateTotal() {
+    let partsTotal = 0;
+    
+    // Расчет стоимости запчастей
+    document.querySelectorAll('.spare-part-row').forEach(row => {
+        const select = row.querySelector('select[name="sparepart_id[]"]');
+        const quantityInput = row.querySelector('input[name="quantity[]"]');
+        const subtotalDiv = row.querySelector('.part-subtotal');
+        
+        if (select.value) {
+            const selectedOption = select.options[select.selectedIndex];
+            const price = parseFloat(selectedOption.dataset.price) || 0;
+            const quantity = parseInt(quantityInput.value) || 1;
+            const subtotal = price * quantity;
+            
+            subtotalDiv.textContent = `${subtotal.toFixed(2)} ₽`;
+            partsTotal += subtotal;
+        }
+    });
+    
+    // Обновление общей стоимости запчастей
+    document.getElementById('partsTotal').textContent = `${partsTotal.toFixed(2)} ₽`;
+    
+    // Расчет общей стоимости
+    const workCost = parseFloat(document.getElementById('work_cost').value) || 0;
+    const totalCost = workCost + partsTotal;
+    document.getElementById('totalCost').textContent = `${totalCost.toFixed(2)} ₽`;
+}
+
+// Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    calculateTotal();
+    
+    // Обработчики событий для автоматического пересчета
+    document.querySelectorAll('input[name="quantity[]"]').forEach(input => {
+        input.addEventListener('change', calculateTotal);
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Наши услуги{% endblock %}
+
+{% block content %}
+<div>
+    <h1>Наши услуги</h1>
+    
+    <div>
+        {% if services %}
+            {% for service in services %}
+                <div>
+                    <div>
+                        <h4>{{ service.name }}</h4>
+                        <p>{{ service.description|default:"Описание отсутствует" }}</p>
+                        <p><strong>Цена:</strong> 
+                            {% if service.price %}
+                                {{ service.price }} руб.
+                            {% else %}
+                                По договоренности
+                            {% endif %}
+                        </p>
+                        {% if service.service_type %}
+                            <p><small>Категория: {{ service.service_type.name }}</small></p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div>
+                <p>В настоящее время услуги не доступны.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

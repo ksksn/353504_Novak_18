@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Отчет по ремонтам</title>
+</head>
+<body>
+    <h1>Отчет по ремонтам</h1>
+    <p>Дата формирования: {{ date_generated|date:"d.m.Y H:i" }}</p>
+
+    <div>
+        <p><strong>Всего ремонтов:</strong> {{ total_repairs }}</p>
+        <p><strong>Общая стоимость:</strong> {{ total_cost|floatformat:2 }} руб.</p>
+    </div>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Клиент</th>
+                <th>Устройство</th>
+                <th>Дата создания</th>
+                <th>Статус</th>
+                <th>Стоимость работ</th>
+                <th>Стоимость запчастей</th>
+                <th>Общая стоимость</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for repair in repairs %}
+            <tr>
+                <td>{{ repair.id }}</td>
+                <td>{{ repair.client.user.get_full_name }}</td>
+                <td>{{ repair.device.name }}</td>
+                <td>{{ repair.created_at|date:"d.m.Y" }}</td>
+                <td>{{ repair.get_status_display }}</td>
+                <td>{{ repair.labor_cost|floatformat:2 }} руб.</td>
+                <td>
+                    {% with parts_cost=repair.repairsparepart_set.all %}
+                        {% if parts_cost %}
+                            {{ parts_cost|length }} запч.
+                        {% else %}
+                            0.00 руб.
+                        {% endif %}
+                    {% endwith %}
+                </td>
+                <td><strong>{{ repair.total_cost|floatformat:2 }} руб.</strong></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8">Ремонты не найдены</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td colspan="7"><strong>Итого:</strong></td>
+                <td><strong>{{ total_cost|floatformat:2 }} руб.</strong></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div>
+        <button onclick="window.print()">Печать отчета</button>
+        <button onclick="window.history.back()">Вернуться назад</button>
+    </div>
+</body>
+</html>

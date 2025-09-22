@@ -1,0 +1,37 @@
+{% extends 'base_simple.html' %}
+
+{% block title %}Подача заявки{% endblock %}
+
+{% block content %}
+<h1>Подача заявки на услуги</h1>
+
+<h3>Выбранные услуги:</h3>
+{% for item in cart_items %}
+    <div>
+        <h4>{{ item.service.name }}</h4>
+        <p>Количество: {{ item.quantity }}</p>
+        <p>Цена: {{ item.service.price }} BYN за единицу</p>
+        <p>Стоимость: {{ item.total_price }} BYN</p>
+        <hr>
+    </div>
+{% endfor %}
+
+<p><strong>Общая стоимость: {{ total_price }} BYN</strong></p>
+
+<form method="post">
+    {% csrf_token %}
+    <div>
+        <label for="notes">Дополнительные примечания:</label>
+        <br>
+        <textarea name="notes" id="notes" rows="5" cols="50" placeholder="Укажите дополнительные пожелания или комментарии..."></textarea>
+    </div>
+    
+    <br>
+    
+    <div>
+        <input type="submit" value="Подать заявку">
+        <a href="{% url 'main:cart' %}">Вернуться к корзине</a>
+    </div>
+</form>
+
+{% endblock %}

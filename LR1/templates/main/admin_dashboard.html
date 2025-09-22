@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}Административные панели{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-cogs"></i> Административные панели
+            </h1>
+            <p class="lead">Выберите нужную панель управления для работы с системой сервисного центра.</p>
+        </div>
+    </div>
+
+    {% if user.is_superuser %}
+        <div class="row">
+            <!-- Основная админка -->
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-tachometer-alt fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Основная админка</h5>
+                        <p class="card-text">Полное управление системой с отчётами и аналитикой</p>
+                        <a href="/admin/" class="btn btn-primary">
+                            <i class="fas fa-arrow-right"></i> Открыть
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Мастер-панель -->
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-tools fa-3x text-success mb-3"></i>
+                        <h5 class="card-title">Мастер-панель</h5>
+                        <p class="card-text">Упрощённая панель для мастеров и сотрудников</p>
+                        <a href="/master/" class="btn btn-success">
+                            <i class="fas fa-arrow-right"></i> Открыть
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Кастомная админка -->
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-desktop fa-3x text-info mb-3"></i>
+                        <h5 class="card-title">Кастомная админка</h5>
+                        <p class="card-text">HTML-интерфейс с пользовательским дизайном</p>
+                        <a href="/custom-admin/" class="btn btn-info">
+                            <i class="fas fa-arrow-right"></i> Открыть
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Django админка -->
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-wrench fa-3x text-warning mb-3"></i>
+                        <h5 class="card-title">Django админка</h5>
+                        <p class="card-text">Стандартная панель Django для отладки</p>
+                        <a href="/django-admin/" class="btn btn-warning">
+                            <i class="fas fa-arrow-right"></i> Открыть
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Дополнительные инструменты -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <h3><i class="fas fa-chart-bar"></i> Отчёты и аналитика</h3>
+            </div>
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="fas fa-chart-line"></i> Финансовые отчёты
+                        </h6>
+                        <a href="/admin/reports/" class="btn btn-outline-primary btn-sm">Открыть</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="fas fa-users"></i> Аналитика клиентов
+                        </h6>
+                        <a href="/admin/reports/clients/" class="btn btn-outline-primary btn-sm">Открыть</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="fas fa-download"></i> Экспорт данных
+                        </h6>
+                        <a href="/admin/reports/export-contracts/" class="btn btn-outline-primary btn-sm">CSV экспорт</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% elif user.is_staff %}
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-tools fa-3x text-success mb-3"></i>
+                        <h5 class="card-title">Мастер-панель</h5>
+                        <p class="card-text">Панель управления для сотрудников сервисного центра</p>
+                        <a href="/master/" class="btn btn-success">
+                            <i class="fas fa-arrow-right"></i> Открыть панель
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            У вас нет прав доступа к административным панелям. Обратитесь к администратору системы.
+        </div>
+    {% endif %}
+
+    <!-- Информация о системе -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5><i class="fas fa-info-circle"></i> Информация о системе</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Текущий пользователь:</strong> {{ user.username }}</p>
+                            <p><strong>Статус:</strong> 
+                                {% if user.is_superuser %}
+                                    <span class="badge bg-danger">Суперпользователь</span>
+                                {% elif user.is_staff %}
+                                    <span class="badge bg-success">Сотрудник</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Пользователь</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Email:</strong> {{ user.email }}</p>
+                            <p><strong>Последний вход:</strong> {{ user.last_login|date:"d.m.Y H:i" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: translateY(-5px);
+}
+</style>
+{% endblock %}

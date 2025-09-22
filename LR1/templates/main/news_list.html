@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Новости{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-4">📰 Новости</h1>
+            <p class="lead">Актуальные новости и события нашей компании</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            {% if news_list %}
+                <div class="row row-cols-1 row-cols-md-2 g-4">
+                {% for news in news_list %}
+                    <div class="col">
+                        <div class="card h-100 shadow-sm">
+                            {% if news.image_url %}
+                                <img src="{{ news.image_url }}" class="card-img-top" alt="{{ news.title }}" style="height: 200px; object-fit: cover;">
+                            {% elif news.image %}
+                                <img src="{{ news.image.url }}" class="card-img-top" alt="{{ news.title }}" style="height: 200px; object-fit: cover;">
+                            {% elif news.random_image_url %}
+                                <img src="{{ news.random_image_url }}" class="card-img-top" alt="{{ news.title }}" style="height: 200px; object-fit: cover;">
+                            {% else %}
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <span class="display-1">📰</span>
+                                </div>
+                            {% endif %}
+                            
+                            <div class="card-body">
+                                <h3 class="card-title">{{ news.title }}</h3>
+                                <p class="card-text">{{ news.short_description|default:"Краткое описание отсутствует"|truncatewords:20 }}</p>
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="text-muted small">📅 {{ news.created_at|date:"d.m.Y" }}</div>
+                                    <a href="{% url 'main:news_detail' news.pk %}" class="btn btn-primary btn-sm">Читать</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+            {% else %}
+                <div class="card">
+                    <div class="card-body text-center">
+                        <div class="display-1 mb-3">📰</div>
+                        <h3>Новости отсутствуют</h3>
+                        <p>В настоящее время новости не опубликованы. Следите за обновлениями!</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    {% if page_obj.has_other_pages %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <nav>
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1">&laquo; Первая</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Следующая</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Последняя &raquo;</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

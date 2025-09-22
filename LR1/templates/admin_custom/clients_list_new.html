@@ -1,0 +1,137 @@
+{% extends 'admin_custom/base.html' %}
+
+{% block title %}Клиенты - Админ-панель{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-users"></i> Клиенты</h1>
+    <a href="{% url 'admin_custom:client_add' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Добавить клиента
+    </a>
+</div>
+
+<!-- Поиск -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-8">
+                <label class="form-label">Поиск клиентов</label>
+                <input type="text" class="form-control" name="search" 
+                       value="{{ search }}" placeholder="Имя, фамилия, email, телефон...">
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-search"></i> Найти
+                </button>
+                <a href="{% url 'admin_custom:clients_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times"></i> Сброс
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Список клиентов -->
+<div class="card table-card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold">
+            Список клиентов ({{ clients.paginator.count }})
+        </h6>
+    </div>
+    <div class="card-body">
+        {% if clients %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Клиент</th>
+                            <th>Контакты</th>
+                            <th>Адрес</th>
+                            <th>Дата регистрации</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for client in clients %}
+                        <tr>
+                            <td>
+                                <div>
+                                    <strong>{{ client.user.get_full_name }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ client.user.username }}</small>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <i class="fas fa-phone text-muted"></i> {{ client.phone|default:"Не указан" }}
+                                    <br>
+                                    <i class="fas fa-envelope text-muted"></i> {{ client.user.email }}
+                                </div>
+                            </td>
+                            <td>
+                                <small>{{ client.address|default:"Не указан" }}</small>
+                            </td>
+                            <td>
+                                <small>{{ client.user.date_joined|date:"d.m.Y" }}</small>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'admin_custom:client_edit' client.id %}" 
+                                       class="btn btn-outline-primary" title="Редактировать">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Пагинация -->
+            {% if clients.has_other_pages %}
+                <nav aria-label="Навигация по страницам">
+                    <ul class="pagination justify-content-center">
+                        {% if clients.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ clients.previous_page_number }}{% if search %}&search={{ search }}{% endif %}">
+                                    Предыдущая
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in clients.paginator.page_range %}
+                            {% if clients.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > clients.number|add:'-3' and num < clients.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if clients.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ clients.next_page_number }}{% if search %}&search={{ search }}{% endif %}">
+                                    Следующая
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">Клиенты не найдены</h5>
+                <p class="text-muted">{% if search %}По вашему запросу ничего не найдено{% else %}Пока нет зарегистрированных клиентов{% endif %}</p>
+                <a href="{% url 'admin_custom:client_add' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Добавить первого клиента
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

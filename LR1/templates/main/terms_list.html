@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Термины{% endblock %}
+
+{% block content %}
+<div>
+    <h1>Словарь терминов</h1>
+    
+    {% if terms %}
+        <div>
+            <p>👥 Всего терминов: {{ terms|length }}</p>
+        </div>
+
+        <div>
+            <span>🔍</span>
+            <input type="text" placeholder="Поиск по вопросам...">
+            <small>💡 Начните вводить ключевые слова для быстрого поиска</small>
+        </div>
+        
+        <div>
+            {% for term in terms %}
+                <details>
+                    <summary>
+                        <strong>{{ term.question }}</strong>
+                        <small>📅 {{ term.created_at|date:"d.m.Y" }}</small>
+                    </summary>
+                    <div>
+                        {{ term.answer|linebreaks }}
+                    </div>
+                </details>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Термины не найдены.</p>
+    {% endif %}
+</div>
+{% endblock %}

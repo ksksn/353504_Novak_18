@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Регистрация{% endblock %}
+
+{% block content %}
+<div>
+    <h3>Регистрация клиента</h3>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div>{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div>
+            <label for="{{ form.username.id_for_label }}">Имя пользователя</label>
+            {{ form.username.as_widget }}
+            {% if form.username.errors %}
+                <div>{{ form.username.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div>
+            <label for="{{ form.email.id_for_label }}">Email</label>
+            {{ form.email.as_widget }}
+            {% if form.email.errors %}
+                <div>{{ form.email.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div>
+            <label for="{{ form.first_name.id_for_label }}">Имя</label>
+            {{ form.first_name.as_widget }}
+            {% if form.first_name.errors %}
+                <div>{{ form.first_name.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div>
+            <label for="{{ form.last_name.id_for_label }}">Фамилия</label>
+            {{ form.last_name.as_widget }}
+            {% if form.last_name.errors %}
+                <div>{{ form.last_name.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div>
+            <label for="{{ form.password1.id_for_label }}">Пароль</label>
+            {{ form.password1.as_widget }}
+            {% if form.password1.errors %}
+                <div>{{ form.password1.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div>
+            <label for="{{ form.password2.id_for_label }}">Подтверждение пароля</label>
+            {{ form.password2.as_widget }}
+            {% if form.password2.errors %}
+                <div>{{ form.password2.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div>
+            <label for="{{ form.phone.id_for_label }}">Номер телефона *</label>
+            {{ form.phone.as_widget }}
+            {% if form.phone.errors %}
+                <div>{{ form.phone.errors }}</div>
+            {% endif %}
+            <small>{{ form.phone.help_text }}</small>
+        </div>
+        
+        <div>
+            <label for="{{ form.birth_date.id_for_label }}">Дата рождения *</label>
+            {{ form.birth_date.as_widget }}
+            {% if form.birth_date.errors %}
+                <div>{{ form.birth_date.errors }}</div>
+            {% endif %}
+            <small>{{ form.birth_date.help_text }}</small>
+        </div>
+        
+        <div>
+            <label for="{{ form.address.id_for_label }}">Адрес *</label>
+            {{ form.address.as_widget }}
+            {% if form.address.errors %}
+                <div>{{ form.address.errors }}</div>
+            {% endif %}
+        </div>
+        
+        {% if form.non_field_errors %}
+            <div>{{ form.non_field_errors }}</div>
+        {% endif %}
+        
+        <div>
+            <button type="submit">Зарегистрироваться</button>
+        </div>
+    </form>
+    
+    <div>
+        <p>Уже есть аккаунт? <a href="{% url 'accounts:login' %}">Войти</a></p>
+    </div>
+</div>
+{% endblock %}

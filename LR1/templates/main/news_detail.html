@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ news.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'main:index' %}">Главная</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'main:news_list' %}">Новости</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ news.title|truncatewords:5 }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <article class="card shadow">
+                <div class="card-header bg-white border-bottom-0">
+                    <h1 class="card-title mb-2">{{ news.title }}</h1>
+                    <div class="d-flex text-muted small mb-2">
+                        <div class="me-3">📅 {{ news.created_at|date:"d.m.Y в H:i" }}</div>
+                        {% if news.updated_at and news.updated_at != news.created_at %}
+                            <div>✏️ Обновлено: {{ news.updated_at|date:"d.m.Y в H:i" }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if news.image_url %}
+                    <img src="{{ news.image_url }}" class="card-img-top" alt="{{ news.title }}" style="max-height: 400px; object-fit: cover;">
+                {% elif news.image %}
+                    <img src="{{ news.image.url }}" class="card-img-top" alt="{{ news.title }}" style="max-height: 400px; object-fit: cover;">
+                {% elif news.random_image_url %}
+                    <img src="{{ news.random_image_url }}" class="card-img-top" alt="{{ news.title }}" style="max-height: 400px; object-fit: cover;">
+                {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
+                        <span class="display-1">📰</span>
+                    </div>
+                {% endif %}
+                
+                <div class="card-body">
+                    {% if news.short_description %}
+                        <div class="lead mb-4">{{ news.short_description }}</div>
+                    {% endif %}
+                    
+                    <div class="news-content">{{ news.content|linebreaks|default:"Содержимое новости отсутствует" }}</div>
+                    
+                    {% if news.tags.all %}
+                        <div class="mt-4">
+                            <strong>🏷️ Теги:</strong>
+                            {% for tag in news.tags.all %}
+                                <span class="badge bg-secondary ms-1">{{ tag.name }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </article>
+            
+            <div class="mt-4">
+                <a href="{% url 'main:news_list' %}" class="btn btn-outline-primary">← Вернуться к новостям</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,253 @@
+{% extends 'admin_custom/base.html' %}
+
+{% block title %}{% if client %}Редактирование клиента{% else %}Добавление клиента{% endif %} - Админ-панель{% endblock %}
+
+{% block extra_css %}
+<style>
+.form-card {
+    background: rgba(255,255,255,0.95);
+    border: 1px solid rgba(var(--primary-blue-rgb), 0.1);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.form-card .card-header {
+    background: linear-gradient(135deg, var(--soft-gray), var(--light-blue));
+    border-bottom: 1px solid rgba(var(--primary-blue-rgb), 0.1);
+    padding: 20px;
+}
+
+.form-card .card-body {
+    padding: 30px;
+}
+
+.form-label {
+    color: var(--dark-gray);
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.form-control {
+    border: 2px solid rgba(var(--primary-blue-rgb), 0.1);
+    border-radius: 10px;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.9);
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 0.2rem rgba(var(--primary-blue-rgb), 0.25);
+    background: white;
+}
+
+.form-text {
+    color: var(--muted-blue);
+    font-size: 0.875rem;
+}
+
+.info-card {
+    background: linear-gradient(135deg, rgba(var(--light-blue-rgb), 0.1), rgba(var(--soft-gray-rgb), 0.1));
+    border: 1px solid rgba(var(--primary-blue-rgb), 0.1);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+.info-card .card-header {
+    background: linear-gradient(135deg, var(--soft-gray), var(--light-blue));
+    border-bottom: 1px solid rgba(var(--primary-blue-rgb), 0.1);
+    padding: 15px 20px;
+}
+
+.info-card .card-body {
+    padding: 20px;
+}
+
+.info-card p {
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+}
+
+.actions-card {
+    background: linear-gradient(135deg, rgba(var(--accent-blue-rgb), 0.05), rgba(var(--primary-blue-rgb), 0.05));
+    border: 1px solid rgba(var(--accent-blue-rgb), 0.1);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+.actions-card .card-header {
+    background: linear-gradient(135deg, var(--accent-blue), var(--primary-blue));
+    border-bottom: none;
+    padding: 15px 20px;
+    color: white;
+}
+
+.actions-card .card-body {
+    padding: 20px;
+}
+
+.quick-action-btn {
+    transition: all 0.3s ease;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-weight: 500;
+}
+
+.quick-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.page-header {
+    background: linear-gradient(135deg, rgba(var(--primary-blue-rgb), 0.05), rgba(var(--light-blue-rgb), 0.1));
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 30px;
+    border: 1px solid rgba(var(--primary-blue-rgb), 0.1);
+}
+
+.page-header h1 {
+    color: var(--dark-gray);
+    font-weight: 700;
+    margin: 0;
+}
+
+.page-header .fas {
+    color: var(--primary-blue);
+    margin-right: 10px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <h1>
+        <i class="fas fa-user"></i> 
+        {% if client %}Редактирование клиента{% else %}Добавление клиента{% endif %}
+    </h1>
+    <a href="{% url 'admin_custom:clients_list' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Назад к списку
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card form-card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-user-edit me-2"></i>
+                    {% if client %}Редактирование данных клиента{% else %}Данные нового клиента{% endif %}
+                </h6>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="first_name" class="form-label">Имя <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" 
+                                       value="{% if client %}{{ client.user.first_name }}{% endif %}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="last_name" class="form-label">Фамилия <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" 
+                                       value="{% if client %}{{ client.user.last_name }}{% endif %}" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if not client %}
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Имя пользователя <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                        <div class="form-text">Уникальное имя для входа в систему</div>
+                    </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control" id="email" name="email" 
+                               value="{% if client %}{{ client.user.email }}{% endif %}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Телефон</label>
+                        <input type="tel" class="form-control" id="phone" name="phone" 
+                               value="{% if client %}{{ client.phone }}{% endif %}" 
+                               placeholder="+7 (999) 123-45-67">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Адрес</label>
+                        <textarea class="form-control" id="address" name="address" rows="3" 
+                                  placeholder="Укажите полный адрес клиента">{% if client %}{{ client.address }}{% endif %}</textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> 
+                            {% if client %}Сохранить изменения{% else %}Создать клиента{% endif %}
+                        </button>
+                        <a href="{% url 'admin_custom:clients_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Отмена
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    {% if client %}
+    <div class="col-md-4">
+        <div class="card info-card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-info-circle me-2"></i>Информация о клиенте
+                </h6>
+            </div>
+            <div class="card-body">
+                <p><strong>ID:</strong> <span class="text-muted">#{{ client.id }}</span></p>
+                <p><strong>Имя пользователя:</strong> <span class="text-muted">{{ client.user.username }}</span></p>
+                <p><strong>Дата регистрации:</strong> <span class="text-muted">{{ client.user.date_joined|date:"d.m.Y H:i" }}</span></p>
+                <p><strong>Последний вход:</strong> 
+                    {% if client.user.last_login %}
+                        <span class="text-muted">{{ client.user.last_login|date:"d.m.Y H:i" }}</span>
+                    {% else %}
+                        <span class="text-muted">Никогда</span>
+                    {% endif %}
+                </p>
+                <p><strong>Активен:</strong> 
+                    {% if client.user.is_active %}
+                        <span class="badge bg-success">Да</span>
+                    {% else %}
+                        <span class="badge bg-danger">Нет</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        
+        <div class="card actions-card mt-3">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-bolt me-2"></i>Быстрые действия
+                </h6>
+            </div>
+            <div class="card-body">
+                <a href="{% url 'admin_custom:device_add' %}?client={{ client.id }}" class="btn btn-outline-primary btn-sm d-block mb-2 quick-action-btn">
+                    <i class="fas fa-mobile-alt"></i> Добавить устройство
+                </a>
+                <a href="{% url 'admin_custom:repair_add' %}?client={{ client.id }}" class="btn btn-outline-success btn-sm d-block quick-action-btn">
+                    <i class="fas fa-wrench"></i> Создать ремонт
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

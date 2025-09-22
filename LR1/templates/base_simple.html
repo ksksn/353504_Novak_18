@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Сервисный центр{% endblock %}</title>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="{% url 'main:index' %}">СервисЦентр Окак</a>
+            <ul>
+                <li><a href="{% url 'main:index' %}">Главная</a></li>
+                <li><a href="{% url 'main:service_list' %}">Услуги</a></li>
+                <li><a href="{% url 'main:news_list' %}">Новости</a></li>
+                <li><a href="{% url 'main:about' %}">О компании</a></li>
+                <li><a href="{% url 'main:contacts' %}">Контакты</a></li>
+                <li><a href="{% url 'main:terms_list' %}">FAQ</a></li>
+                <li><a href="{% url 'main:vacancies' %}">Вакансии</a></li>
+                <li><a href="{% url 'main:reviews_list' %}">Отзывы</a></li>
+                <li><a href="{% url 'main:promocodes' %}">Промокоды</a></li>
+            </ul>
+            
+            <ul>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'main:cart' %}">Корзина</a></li>
+                    <li><a href="{% url 'main:service_requests' %}">Мои заявки</a></li>
+                    <li><a href="{% url 'accounts:profile' %}">Профиль</a></li>
+                    <li>
+                        <form method="post" action="{% url 'accounts:logout' %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" style="background: none; border: none; color: inherit; text-decoration: underline; cursor: pointer;">
+                                Выйти
+                            </button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li><a href="{% url 'accounts:login' %}">Войти</a></li>
+                    <li><a href="{% url 'accounts:register' %}">Регистрация</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% if messages %}
+            <div>
+                {% for message in messages %}
+                    <div>{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <div>
+            <p>&copy; 2024 Сервисный центр. Все права защищены.</p>
+            <p>Профессиональный ремонт техники с гарантией качества</p>
+        </div>
+    </footer>
+
+    <!-- Простой календарь -->
+    <div style="background-color: #f8f9fa; padding: 20px; border-top: 1px solid #dee2e6; text-align: center;">
+        <h6>Текущая дата и время</h6>
+        <p id="current-date-simple"></p>
+        <p id="utc-time-simple" style="color: #6c757d; font-size: 0.9em;"></p>
+        <input type="date" id="simple-calendar-simple" style="padding: 5px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+
+    <script>
+        function updateDateTimeSimple() {
+            const now = new Date();
+            
+            // Местная дата и время
+            const localDateTime = now.toLocaleString('ru-RU', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('current-date-simple').textContent = localDateTime;
+            
+            // UTC время
+            const utcTime = now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+            document.getElementById('utc-time-simple').textContent = utcTime;
+            
+            // Установка текущей даты в календарь
+            const today = now.toISOString().split('T')[0];
+            document.getElementById('simple-calendar-simple').value = today;
+        }
+        
+        // Обновляем время каждую секунду
+        updateDateTimeSimple();
+        setInterval(updateDateTimeSimple, 1000);
+    </script>
+</body>
+</html>

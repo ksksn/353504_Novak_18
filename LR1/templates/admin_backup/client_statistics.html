@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Статистика по клиентам</title>
+</head>
+<body>
+    <h1>Статистика по клиентам</h1>
+    <p>Дата формирования: {{ date_generated|date:"d.m.Y H:i" }}</p>
+
+    <div>
+        <div>Всего клиентов: {{ total_clients }}</div>
+        <div>Всего договоров: 
+            {% with total_contracts=0 %}
+                {% for stat in client_stats %}
+                    {% with total_contracts=total_contracts|add:stat.contracts_count %}
+                        {% if forloop.last %}
+                            {{ total_contracts }}
+                        {% endif %}
+                    {% endwith %}
+                {% endfor %}
+            {% endwith %}
+        </div>
+    </div>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Клиент</th>
+                <th>Телефон</th>
+                <th>Ремонтов</th>
+                <th>Договоров</th>
+                <th>Потрачено</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stat in client_stats %}
+            <tr>
+                <td>
+                    {{ stat.client.user.get_full_name }}
+                    {% if stat.client.is_vip %}
+                    <span>VIP</span>
+                    {% endif %}
+                </td>
+                <td>{{ stat.client.phone }}</td>
+                <td>{{ stat.repairs_count }}</td>
+                <td>{{ stat.contracts_count }}</td>
+                <td>{{ stat.total_spent|floatformat:2 }} руб.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div>
+        <button onclick="window.print()">Печать отчета</button>
+        <button onclick="window.history.back()">Вернуться назад</button>
+    </div>
+</body>
+</html>

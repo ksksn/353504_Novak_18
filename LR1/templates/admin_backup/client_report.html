@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Отчет по клиенту</title>
+</head>
+<body>
+    <h1>Отчет по клиенту: {{ client_info.client.user.get_full_name }}</h1>
+    <p>Дата формирования: {{ date_generated|date:"d.m.Y H:i" }}</p>
+
+    <div>
+        <div>
+            <div><strong>Дата регистрации:</strong> {{ client_info.client.registration_date|date:"d.m.Y" }}</div>
+            <div><strong>Всего потрачено:</strong> {{ client_info.total_spent|floatformat:2 }} руб.</div>
+            <div><strong>Количество ремонтов:</strong> {{ client_info.repairs.count }}</div>
+            <div><strong>Количество договоров:</strong> {{ client_info.contracts.count }}</div>
+        </div>
+    </div>
+    
+    <div>
+        <h4>История ремонтов</h4>
+        
+        {% if client_info.repairs %}
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Устройство</th>
+                    <th>Дата создания</th>
+                    <th>Статус</th>
+                    <th>Стоимость работ</th>
+                    <th>Общая стоимость</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for repair in client_info.repairs %}
+                <tr>
+                    <td>{{ repair.id }}</td>
+                    <td>{{ repair.device.name }}</td>
+                    <td>{{ repair.created_at|date:"d.m.Y" }}</td>
+                    <td>{{ repair.get_status_display }}</td>
+                    <td>{{ repair.labor_cost|floatformat:2 }} руб.</td>
+                    <td>{{ repair.total_cost|floatformat:2 }} руб.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>У клиента нет ремонтов</p>
+        {% endif %}
+        
+        <h4>Договоры</h4>
+        
+        {% if client_info.contracts %}
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Номер</th>
+                    <th>Дата заключения</th>
+                    <th>Срок выполнения</th>
+                    <th>Статус</th>
+                    <th>Услуг</th>
+                    <th>Сумма</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contract in client_info.contracts %}
+                <tr>
+                    <td>{{ contract.number }}</td>
+                    <td>{{ contract.date_signed|date:"d.m.Y" }}</td>
+                    <td>{{ contract.deadline|date:"d.m.Y" }}</td>
+                    <td>{% if contract.is_completed %}Выполнен{% else %}В работе{% endif %}</td>
+                    <td>{{ contract.order_set.count }}</td>
+                    <td>{{ contract.total_sum|floatformat:2 }} руб.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>У клиента нет договоров</p>
+        {% endif %}
+    </div>
+
+    <div>
+        <button onclick="window.print()">Печать отчета</button>
+        <button onclick="window.history.back()">Вернуться назад</button>
+    </div>
+</body>
+</html>

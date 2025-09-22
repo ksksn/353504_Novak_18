@@ -1,0 +1,55 @@
+{% extends 'base_simple.html' %}
+
+{% block title %}Заявка #{{ service_request.id }}{% endblock %}
+
+{% block content %}
+<h1>Заявка #{{ service_request.id }}</h1>
+
+<div>
+    <h3>Информация о заявке</h3>
+    <p>Дата создания: {{ service_request.created_at|date:"d.m.Y H:i" }}</p>
+    <p>Дата обновления: {{ service_request.updated_at|date:"d.m.Y H:i" }}</p>
+    <p>Статус: 
+        {% if service_request.status == 'pending' %}
+            Ожидает рассмотрения
+        {% elif service_request.status == 'approved' %}
+            Одобрена
+        {% elif service_request.status == 'rejected' %}
+            Отклонена
+        {% elif service_request.status == 'completed' %}
+            Выполнена
+        {% endif %}
+    </p>
+    <p>Общая стоимость: {{ service_request.total_price }} BYN</p>
+    
+    {% if service_request.assigned_employee %}
+        <p>Назначенный мастер: {{ service_request.assigned_employee.user.get_full_name }}</p>
+        <p>Телефон мастера: {{ service_request.assigned_employee.phone }}</p>
+    {% endif %}
+    
+    {% if service_request.notes %}
+        <p>Ваши примечания: {{ service_request.notes }}</p>
+    {% endif %}
+    
+    {% if service_request.admin_notes %}
+        <p>Примечания администратора: {{ service_request.admin_notes }}</p>
+    {% endif %}
+</div>
+
+<div>
+    <h3>Услуги в заявке</h3>
+    {% for item in items %}
+        <div>
+            <h4>{{ item.service.name }}</h4>
+            <p>{{ item.service.description }}</p>
+            <p>Количество: {{ item.quantity }}</p>
+            <p>Цена за единицу: {{ item.price }} BYN</p>
+            <p>Стоимость: {{ item.total_price }} BYN</p>
+            <hr>
+        </div>
+    {% endfor %}
+</div>
+
+<p><a href="{% url 'main:service_requests' %}">Вернуться к списку заявок</a></p>
+
+{% endblock %}

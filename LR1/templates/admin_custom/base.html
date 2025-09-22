@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Админ-панель сервисного центра{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Пастельная серо-голубо-белая палитра */
+        :root {
+            --primary-blue: #a8c8e8;
+            --secondary-blue: #d6e8f7;
+            --light-blue: #f0f6fb;
+            --soft-gray: #e8ecf0;
+            --medium-gray: #bdc3c7;
+            --dark-gray: #7f8c8d;
+            --white: #ffffff;
+            --text-dark: #2c3e50;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--light-blue) 0%, var(--secondary-blue) 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            box-shadow: 3px 0 15px rgba(168, 200, 232, 0.3);
+            border-right: 1px solid var(--medium-gray);
+        }
+        
+        .sidebar .nav-link {
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin: 3px 8px;
+            font-weight: 500;
+        }
+        
+        .sidebar .nav-link:hover {
+            color: var(--white);
+            background: linear-gradient(45deg, var(--primary-blue), var(--secondary-blue));
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(168, 200, 232, 0.4);
+        }
+        
+        .sidebar .nav-link.active {
+            color: var(--white);
+            background: linear-gradient(45deg, var(--primary-blue), var(--dark-gray));
+            box-shadow: 0 6px 20px rgba(168, 200, 232, 0.5);
+        }
+        
+        .main-content {
+            padding: 30px;
+            background: var(--white);
+            margin: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(168, 200, 232, 0.2);
+            border: 1px solid var(--soft-gray);
+        }
+        
+        .stats-card {
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(135deg, var(--white) 0%, var(--light-blue) 100%);
+            box-shadow: 0 8px 25px rgba(168, 200, 232, 0.15);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .stats-card .card-body {
+            padding: 1.5rem;
+        }
+        .stats-icon {
+            font-size: 2rem;
+            opacity: 0.8;
+        }
+        .table-actions {
+            min-width: 120px;
+        }
+        .status-badge {
+            font-size: 0.75rem;
+        }
+        .search-form {
+            max-width: 400px;
+        }
+        .alert-auto-hide {
+            transition: opacity 0.5s;
+        }
+
+        /* Дополнительные стили для пастельного дизайна */
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(168, 200, 232, 0.25);
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            background: var(--white);
+            box-shadow: 0 6px 20px rgba(168, 200, 232, 0.1);
+            border: 1px solid var(--soft-gray);
+        }
+
+        .card-header {
+            background: linear-gradient(90deg, var(--secondary-blue), var(--light-blue));
+            border-bottom: 1px solid var(--medium-gray);
+            border-radius: 12px 12px 0 0 !important;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary-blue), var(--secondary-blue));
+            border: 1px solid var(--primary-blue);
+            color: var(--text-dark);
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(45deg, var(--secondary-blue), var(--primary-blue));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(168, 200, 232, 0.4);
+            border-color: var(--medium-gray);
+            color: var(--text-dark);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #90c695, #a8d4ad);
+            border: 1px solid #7fb087;
+            color: var(--text-dark);
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(45deg, #a8d4ad, #90c695);
+            transform: translateY(-2px);
+            color: var(--text-dark);
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #f9d89c, #fce4a6);
+            border: 1px solid #f7c873;
+            color: var(--text-dark);
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-warning:hover {
+            background: linear-gradient(45deg, #fce4a6, #f9d89c);
+            transform: translateY(-2px);
+            color: var(--text-dark);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, var(--soft-gray), var(--medium-gray));
+            border: 1px solid var(--medium-gray);
+            color: var(--text-dark);
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(45deg, var(--medium-gray), var(--soft-gray));
+            transform: translateY(-2px);
+            color: var(--text-dark);
+        }
+
+        .form-control, .form-select {
+            border: 2px solid var(--soft-gray);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background: var(--white);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 0.2rem rgba(168, 200, 232, 0.25);
+            background: var(--light-blue);
+        }
+
+        .table {
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(168, 200, 232, 0.1);
+        }
+
+        .table thead th {
+            background: linear-gradient(90deg, var(--secondary-blue), var(--light-blue));
+            border: none;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background: var(--light-blue);
+            transform: scale(1.01);
+        }
+
+        .border-bottom {
+            border-bottom: 2px solid var(--soft-gray) !important;
+        }
+
+        .text-primary {
+            color: var(--text-dark) !important;
+        }
+
+        .bg-primary {
+            background: linear-gradient(45deg, var(--primary-blue), var(--secondary-blue)) !important;
+        }
+
+        .alert {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(168, 200, 232, 0.15);
+        }
+
+        .alert-success {
+            background: linear-gradient(45deg, #d4edda, #90c695);
+            color: var(--text-dark);
+            border: 1px solid #90c695;
+        }
+
+        .alert-warning {
+            background: linear-gradient(45deg, #fff3cd, #f9d89c);
+            color: var(--text-dark);
+            border: 1px solid #f9d89c;
+        }
+
+        .alert-danger {
+            background: linear-gradient(45deg, #f8d7da, #e8a1a8);
+            color: var(--text-dark);
+            border: 1px solid #e8a1a8;
+        }
+
+        .alert-info {
+            background: linear-gradient(45deg, var(--light-blue), var(--secondary-blue));
+            color: var(--text-dark);
+            border: 1px solid var(--primary-blue);
+        }
+
+        .modal-content {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 15px 50px rgba(168, 200, 232, 0.3);
+        }
+
+        .modal-header {
+            background: linear-gradient(90deg, var(--secondary-blue), var(--light-blue));
+            border-bottom: 1px solid var(--soft-gray);
+            border-radius: 15px 15px 0 0;
+        }
+
+        .pagination .page-link {
+            color: var(--text-dark);
+            background: var(--light-blue);
+            border: 1px solid var(--soft-gray);
+            border-radius: 6px;
+            margin: 0 2px;
+            transition: all 0.3s ease;
+        }
+
+        .pagination .page-link:hover {
+            background: var(--primary-blue);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(45deg, var(--primary-blue), var(--secondary-blue));
+            border-color: var(--primary-blue);
+            color: var(--text-dark);
+        }
+
+        .badge {
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .bg-success {
+            background: linear-gradient(45deg, #90c695, #a8d4ad) !important;
+        }
+
+        .bg-warning {
+            background: linear-gradient(45deg, #f9d89c, #fce4a6) !important;
+        }
+
+        .bg-info {
+            background: linear-gradient(45deg, var(--primary-blue), var(--secondary-blue)) !important;
+        }
+
+        .bg-secondary {
+            background: linear-gradient(45deg, var(--soft-gray), var(--medium-gray)) !important;
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .main-content > * {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* Кастомные эффекты */
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(168, 200, 232, 0.3);
+        }
+
+        .soft-shadow {
+            box-shadow: 0 8px 32px rgba(168, 200, 232, 0.15);
+        }
+
+        .hover-lift {
+            transition: transform 0.3s ease;
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-3px);
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Боковая панель -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h5 class="text-light">
+                            <i class="fas fa-tools"></i>
+                            Админ-панель
+                        </h5>
+                    </div>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" 
+                               href="{% url 'admin_custom:dashboard' %}">
+                                <i class="fas fa-tachometer-alt"></i>
+                                Панель управления
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'clients' in request.resolver_match.url_name %}active{% endif %}" 
+                               href="{% url 'admin_custom:clients_list' %}">
+                                <i class="fas fa-users"></i>
+                                Клиенты
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'devices' in request.resolver_match.url_name %}active{% endif %}" 
+                               href="{% url 'admin_custom:devices_list' %}">
+                                <i class="fas fa-mobile-alt"></i>
+                                Устройства
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'spareparts' in request.resolver_match.url_name %}active{% endif %}" 
+                               href="{% url 'admin_custom:spareparts_list' %}">
+                                <i class="fas fa-cogs"></i>
+                                Запчасти
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'repairs' in request.resolver_match.url_name %}active{% endif %}" 
+                               href="{% url 'admin_custom:repairs_list' %}">
+                                <i class="fas fa-wrench"></i>
+                                Ремонты
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'reports' in request.resolver_match.url_name %}active{% endif %}" 
+                               href="{% url 'admin_custom:reports' %}">
+                                <i class="fas fa-chart-bar"></i>
+                                Отчеты
+                            </a>
+                        </li>
+                        <li class="nav-item mt-3">
+                            <hr class="text-secondary">
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">
+                                <i class="fas fa-home"></i>
+                                Главная сайта
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/django-admin/">
+                                <i class="fas fa-cog"></i>
+                                Django Admin
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <form method="post" action="{% url 'accounts:logout' %}" style="margin: 0; padding: 0;">
+                                {% csrf_token %}
+                                <button type="submit" class="nav-link btn btn-link border-0 text-start w-100" style="color: #adb5bd;">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Выйти
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Основной контент -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <!-- Верхняя панель -->
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">{% block page_title %}Админ-панель{% endblock %}</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        {% block page_actions %}{% endblock %}
+                    </div>
+                </div>
+
+                <!-- Сообщения -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show alert-auto-hide" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Основной контент страницы -->
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Автоматическое скрытие уведомлений
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert-auto-hide');
+            alerts.forEach(function(alert) {
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.remove();
+                }, 500);
+            });
+        }, 5000);
+
+        // Подтверждение удаления
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('delete-confirm')) {
+                if (!confirm('Вы уверены, что хотите удалить этот элемент?')) {
+                    e.preventDefault();
+                }
+            }
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

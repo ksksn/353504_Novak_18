@@ -1,0 +1,61 @@
+{% extends 'base_simple.html' %}
+
+{% block title %}Управление заявками{% endblock %}
+
+{% block content %}
+<h1>Управление заявками клиентов</h1>
+
+<div>
+    <h3>Фильтры</h3>
+    <form method="get">
+        <p>
+            Статус: 
+            <select name="status">
+                <option value="">Все</option>
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if value == current_status %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="Фильтр">
+            <a href="{% url 'main:admin_service_requests' %}">Сбросить</a>
+        </p>
+    </form>
+</div>
+
+<hr>
+
+{% if requests %}
+    {% for request in requests %}
+        <div>
+            <h3>Заявка #{{ request.id }}</h3>
+            <p>Клиент: {{ request.client.user.get_full_name }}</p>
+            <p>Дата создания: {{ request.created_at|date:"d.m.Y H:i" }}</p>
+            <p>Статус: 
+                {% if request.status == 'pending' %}
+                    Ожидает рассмотрения
+                {% elif request.status == 'approved' %}
+                    Одобрена
+                {% elif request.status == 'rejected' %}
+                    Отклонена
+                {% elif request.status == 'completed' %}
+                    Выполнена
+                {% endif %}
+            </p>
+            <p>Общая стоимость: {{ request.total_price }} BYN</p>
+            
+            {% if request.assigned_employee %}
+                <p>Назначенный мастер: {{ request.assigned_employee.user.get_full_name }}</p>
+            {% endif %}
+            
+            <p><a href="{% url 'main:admin_service_request_detail' request.id %}">Управление заявкой</a></p>
+            
+            <hr>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>Заявки не найдены</p>
+{% endif %}
+
+{% endblock %}

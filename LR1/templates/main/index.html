@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная - Сервисный центр{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero секция -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="bg-primary text-white rounded p-5 text-center">
+                <h1 class="display-4 mb-3">Добро пожаловать в наш сервисный центр</h1>
+                <p class="lead">Профессиональный ремонт техники с гарантией качества</p>
+                <div class="mt-4">
+                    <a href="{% url 'main:service_list' %}" class="btn btn-light btn-lg me-3">Наши услуги</a>
+                    <a href="{% url 'main:about' %}" class="btn btn-outline-light btn-lg">Узнать больше</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Преимущества -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-center mb-4">Наши преимущества</h2>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <div class="display-4 text-primary mb-3">🔧</div>
+                    <h5 class="card-title">Качество</h5>
+                    <p class="card-text">Высокое качество предоставляемых услуг и профессиональные мастера</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <div class="display-4 text-success mb-3">🛡️</div>
+                    <h5 class="card-title">Надежность</h5>
+                    <p class="card-text">Надежный партнер для вашего бизнеса с гарантией на все работы</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 text-center">
+                <div class="card-body">
+                    <div class="display-4 text-info mb-3">⚡</div>
+                    <h5 class="card-title">Инновации</h5>
+                    <p class="card-text">Современные технологии и решения для быстрого ремонта</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Последняя новость -->
+    {% if latest_news %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-center mb-4">📰 Последние новости</h2>
+        </div>
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-lg">
+                {% if latest_news.image_url %}
+                    <img src="{{ latest_news.image_url }}" class="card-img-top" alt="{{ latest_news.title }}" style="height: 300px; object-fit: cover;">
+                {% elif latest_news.image %}
+                    <img src="{{ latest_news.image.url }}" class="card-img-top" alt="{{ latest_news.title }}" style="height: 300px; object-fit: cover;">
+                {% elif latest_news.random_image_url %}
+                    <img src="{{ latest_news.random_image_url }}" class="card-img-top" alt="{{ latest_news.title }}" style="height: 300px; object-fit: cover;">
+                {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 300px;">
+                        <span class="display-1 text-muted">📰</span>
+                    </div>
+                {% endif %}
+                
+                <div class="card-body">
+                    <h3 class="card-title">{{ latest_news.title }}</h3>
+                    
+                    {% if latest_news.short_description %}
+                        <p class="card-text lead">{{ latest_news.short_description|truncatewords:25 }}</p>
+                    {% else %}
+                        <p class="card-text">{{ latest_news.content|striptags|truncatewords:30 }}</p>
+                    {% endif %}
+                    
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div class="text-muted small">
+                            <i class="fas fa-calendar"></i> {{ latest_news.created_at|date:"d.m.Y в H:i" }}
+                        </div>
+                        <div>
+                            <a href="{% url 'main:news_detail' latest_news.pk %}" class="btn btn-primary">
+                                Читать полностью
+                            </a>
+                            <a href="{% url 'main:news_list' %}" class="btn btn-outline-secondary ms-2">
+                                Все новости
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-center mb-4">📰 Новости</h2>
+        </div>
+        <div class="col-lg-6 mx-auto">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="display-1 mb-3">📰</div>
+                    <h5>Новости скоро появятся</h5>
+                    <p class="text-muted">Следите за обновлениями на нашем сайте</p>
+                    <a href="{% url 'main:news_list' %}" class="btn btn-outline-primary">
+                        Перейти к новостям
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Быстрые ссылки -->
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-center mb-4">Быстрые ссылки</h2>
+        </div>
+        <div class="col-md-3 mb-3">
+            <a href="{% url 'main:service_list' %}" class="text-decoration-none">
+                <div class="card h-100 text-center border-primary">
+                    <div class="card-body">
+                        <div class="display-4 text-primary mb-3">🔧</div>
+                        <h6 class="card-title">Услуги</h6>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3 mb-3">
+            <a href="{% url 'main:contacts' %}" class="text-decoration-none">
+                <div class="card h-100 text-center border-success">
+                    <div class="card-body">
+                        <div class="display-4 text-success mb-3">📞</div>
+                        <h6 class="card-title">Контакты</h6>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3 mb-3">
+            <a href="{% url 'main:faq_list' %}" class="text-decoration-none">
+                <div class="card h-100 text-center border-info">
+                    <div class="card-body">
+                        <div class="display-4 text-info mb-3">❓</div>
+                        <h6 class="card-title">FAQ</h6>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3 mb-3">
+            <a href="{% url 'main:reviews_list' %}" class="text-decoration-none">
+                <div class="card h-100 text-center border-warning">
+                    <div class="card-body">
+                        <div class="display-4 text-warning mb-3">⭐</div>
+                        <h6 class="card-title">Отзывы</h6>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

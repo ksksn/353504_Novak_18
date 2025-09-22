@@ -1,0 +1,94 @@
+{% extends "admin/base_site.html" %}
+{% load admin_urls static %}
+
+{% block title %}Статистика по клиентам{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <h1>Статистика по клиентам</h1>
+    
+    <div class="module">
+        <h2>Общие показатели</h2>
+        <table>
+            <tr>
+                <td><strong>Всего клиентов:</strong></td>
+                <td>{{ total_clients }}</td>
+            </tr>
+            <tr>
+                <td><strong>Активных клиентов:</strong></td>
+                <td>{{ active_clients }}</td>
+            </tr>
+            <tr>
+                <td><strong>VIP клиентов:</strong></td>
+                <td>{{ vip_clients.count }}</td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="module">
+        <h2>Топ клиенты по потраченной сумме</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Клиент</th>
+                    <th>Телефон</th>
+                    <th>Ремонтов</th>
+                    <th>Потрачено</th>
+                    <th>VIP</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for client in top_clients %}
+                <tr>
+                    <td>{{ client.user.get_full_name }}</td>
+                    <td>{{ client.phone }}</td>
+                    <td>{{ client.repairs_count }}</td>
+                    <td>{{ client.total_spent|floatformat:2 }} руб.</td>
+                    <td>{% if client.is_vip %}Да{% else %}Нет{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    {% if vip_clients %}
+    <div class="module">
+        <h2>VIP клиенты</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Клиент</th>
+                    <th>Телефон</th>
+                    <th>Ремонтов</th>
+                    <th>Потрачено</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for client in vip_clients %}
+                <tr>
+                    <td>{{ client.user.get_full_name }}</td>
+                    <td>{{ client.phone }}</td>
+                    <td>{{ client.repairs_count }}</td>
+                    <td>{{ client.total_spent|floatformat:2 }} руб.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+    
+    <div class="submit-row">
+        <a href="{% url 'admin:index' %}" class="default">Назад в админ-панель</a>
+        <button onclick="window.print()" class="default">Печать отчета</button>
+    </div>
+</div>
+
+<style>
+@media print {
+    .submit-row { display: none; }
+    .breadcrumbs { display: none; }
+    #header { display: none; }
+    #nav-sidebar { display: none; }
+}
+</style>
+{% endblock %}

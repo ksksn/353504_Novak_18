@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Вакансии{% endblock %}
+
+{% block content %}
+<div>
+    <h1>Вакансии</h1>
+    
+    {% if vacancies %}
+        {% for vacancy in vacancies %}
+            <div>
+                <h3>{{ vacancy.title }}</h3>
+                <p><strong>Зарплата:</strong> {{ vacancy.salary|default:"По договоренности" }}</p>
+                <p><strong>Дата размещения:</strong> {{ vacancy.date_posted|date:"d.m.Y" }}</p>
+                <p>{{ vacancy.description }}</p>
+                {% if vacancy.requirements %}
+                    <p><strong>Требования:</strong> {{ vacancy.requirements }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>В настоящее время вакансий нет.</p>
+    {% endif %}
+</div>
+{% endblock %}

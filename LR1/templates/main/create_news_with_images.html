@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block title %}Создать новость с изображением{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>📰 Создать новость с изображением из API</h2>
+            
+            <form id="newsForm">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="title" class="form-label">Заголовок *</label>
+                    <input type="text" class="form-control" id="title" name="title" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="short_description" class="form-label">Краткое описание</label>
+                    <input type="text" class="form-control" id="short_description" name="short_description" maxlength="300">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="content" class="form-label">Содержание</label>
+                    <textarea class="form-control" id="content" name="content" rows="6"></textarea>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="category" class="form-label">Категория</label>
+                    <select class="form-control" id="category" name="category">
+                        <option value="Новости компании">Новости компании</option>
+                        <option value="Техника">Техника</option>
+                        <option value="Ремонт">Ремонт</option>
+                        <option value="Акции">Акции</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="image_category" class="form-label">Категория изображения</label>
+                    <select class="form-control" id="image_category" name="image_category">
+                        <option value="technology">Технологии</option>
+                        <option value="repair">Ремонт</option>
+                        <option value="service">Сервис</option>
+                        <option value="news">Новости</option>
+                        <option value="mobile">Мобильные устройства</option>
+                        <option value="computer">Компьютеры</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="tags" class="form-label">Теги (через запятую)</label>
+                    <input type="text" class="form-control" id="tags" name="tags" placeholder="Ремонт, Техника, Сервис">
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Создать новость
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="loadTemplate()">
+                    <i class="fas fa-magic"></i> Загрузить шаблон
+                </button>
+            </form>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>🚀 Быстрое создание</h5>
+                </div>
+                <div class="card-body">
+                    <p>Используйте готовые шаблоны:</p>
+                    <button class="btn btn-outline-primary btn-sm mb-2" onclick="createQuickNews('repair_news')">
+                        🔧 Новость о ремонте
+                    </button>
+                    <button class="btn btn-outline-success btn-sm mb-2" onclick="createQuickNews('discount_news')">
+                        💰 Новость об акции
+                    </button>
+                    <button class="btn btn-outline-info btn-sm mb-2" onclick="createQuickNews('service_news')">
+                        🛠️ Новость о сервисе
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card mt-3" id="imagePreview" style="display: none;">
+                <div class="card-header">
+                    <h6>🖼️ Предпросмотр изображения</h6>
+                </div>
+                <div class="card-body">
+                    <img id="previewImg" src="" alt="Предпросмотр" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="result" class="mt-4"></div>
+</div>
+
+<script>
+document.getElementById('newsForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const tags = formData.get('tags');
+    
+    const data = {
+        title: formData.get('title'),
+        short_description: formData.get('short_description'),
+        content: formData.get('content'),
+        category: formData.get('category'),
+        image_category: formData.get('image_category'),
+        tags: tags ? tags.split(',').map(tag => tag.trim()) : []
+    };
+    
+    try {
+        const response = await fetch('/api/news-with-images/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        showResult(result, response.ok);
+        
+        if (response.ok) {
+            this.reset();
+            document.getElementById('imagePreview').style.display = 'none';
+        }
+    } catch (error) {
+        showResult({error: 'Ошибка сети: ' + error.message}, false);
+    }
+});
+
+async function createQuickNews(template) {
+    try {
+        const response = await fetch('/api/quick-news/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({template: template})
+        });
+        
+        const result = await response.json();
+        showResult(result, response.ok);
+    } catch (error) {
+        showResult({error: 'Ошибка сети: ' + error.message}, false);
+    }
+}
+
+function loadTemplate() {
+    const templates = {
+        repair: {
+            title: 'Новое оборудование для ремонта смартфонов',
+            short_description: 'Приобрели современную паяльную станцию и микроскоп для более качественного ремонта.',
+            content: 'В нашем сервисном центре появилось новое высокотехнологичное оборудование...',
+            category: 'Техника',
+            image_category: 'repair',
+            tags: 'Ремонт, Техника'
+        }
+    };
+    
+    const template = templates.repair;
+    document.getElementById('title').value = template.title;
+    document.getElementById('short_description').value = template.short_description;
+    document.getElementById('content').value = template.content;
+    document.getElementById('category').value = template.category;
+    document.getElementById('image_category').value = template.image_category;
+    document.getElementById('tags').value = template.tags;
+}
+
+// Предпросмотр изображения при изменении категории
+document.getElementById('image_category').addEventListener('change', async function() {
+    const category = this.value;
+    const preview = document.getElementById('imagePreview');
+    const img = document.getElementById('previewImg');
+    
+    try {
+        // Получаем пример изображения для выбранной категории
+        const url = `https://source.unsplash.com/400x300/?${category}`;
+        img.src = url;
+        preview.style.display = 'block';
+    } catch (error) {
+        preview.style.display = 'none';
+    }
+});
+
+function showResult(result, success) {
+    const resultDiv = document.getElementById('result');
+    
+    if (success) {
+        resultDiv.innerHTML = `
+            <div class="alert alert-success">
+                <h5>✅ ${result.message}</h5>
+                <p><strong>Новость:</strong> ${result.news.title}</p>
+                <p><strong>ID:</strong> ${result.news.id}</p>
+                <p><strong>Категория:</strong> ${result.news.category}</p>
+                <p><strong>Теги:</strong> ${result.news.tags.join(', ')}</p>
+                ${result.news.image_url ? `<img src="${result.news.image_url}" alt="Изображение новости" class="img-thumbnail mt-2" style="max-width: 200px;">` : ''}
+                <div class="mt-2">
+                    <a href="${result.news.url}" class="btn btn-sm btn-outline-primary" target="_blank">Просмотреть новость</a>
+                </div>
+            </div>
+        `;
+    } else {
+        resultDiv.innerHTML = `
+            <div class="alert alert-danger">
+                <h5>❌ Ошибка</h5>
+                <p>${result.error}</p>
+            </div>
+        `;
+    }
+}
+</script>
+{% endblock %}

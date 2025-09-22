@@ -1,0 +1,105 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls static admin_list %}
+
+{% block content_title %}
+    <h1>{{ title }}</h1>
+{% endblock %}
+
+{% block result_list %}
+    <div>
+        <div>
+            
+            <div>
+                <h3>Статистика по годам</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Год</th>
+                            <th>Количество ремонтов</th>
+                            <th>Общий доход</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stat in yearly_stats %}
+                        <tr>
+                            <td>{{ stat.year }}</td>
+                            <td>{{ stat.total_repairs }}</td>
+                            <td>{{ stat.total_revenue|floatformat:2 }} руб.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div>
+                <h3>Топ клиентов</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Клиент</th>
+                            <th>Ремонтов</th>
+                            <th>Потрачено</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for client in client_stats %}
+                        <tr>
+                            <td>{{ client.user.get_full_name }}</td>
+                            <td>{{ client.repairs_count }}</td>
+                            <td>{{ client.total_spent|floatformat:2 }} руб.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div>
+            <h3>Топ договоров</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Номер договора</th>
+                        <th>Клиент</th>
+                        <th>Заказов</th>
+                        <th>Сумма</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contract in contract_stats %}
+                    <tr>
+                        <td>{{ contract.number }}</td>
+                        <td>{{ contract.client.user.get_full_name }}</td>
+                        <td>{{ contract.orders_count }}</td>
+                        <td>{{ contract.total_value|floatformat:2 }} руб.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div>
+        <h3>Популярные запчасти</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Запчасть</th>
+                    <th>Категория</th>
+                    <th>Использовано</th>
+                    <th>Цена</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for part in popular_parts %}
+                <tr>
+                    <td>{{ part.name }}</td>
+                    <td>{{ part.category }}</td>
+                    <td>{{ part.usage_count|default:0 }}</td>
+                    <td>{{ part.price }} руб.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

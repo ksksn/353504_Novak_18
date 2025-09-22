@@ -1,0 +1,143 @@
+{% extends 'admin_custom/base.html' %}
+
+{% block title %}{% if sparepart %}Редактирование запчасти{% else %}Добавление запчасти{% endif %} - Админ-панель{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>
+        <i class="fas fa-cogs"></i> 
+        {% if sparepart %}Редактирование запчасти{% else %}Добавление запчасти{% endif %}
+    </h1>
+    <a href="{% url 'admin_custom:spareparts_list' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Назад к списку
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0">{% if sparepart %}Редактирование данных запчасти{% else %}Данные новой запчасти{% endif %}</h6>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Название запчасти <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="name" name="name" 
+                               value="{% if sparepart %}{{ sparepart.name }}{% endif %}" 
+                               placeholder="Например: Экран iPhone 13" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="part_number" class="form-label">Артикул</label>
+                                <input type="text" class="form-control" id="part_number" name="part_number" 
+                                       value="{% if sparepart %}{{ sparepart.part_number }}{% endif %}" 
+                                       placeholder="Уникальный артикул">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="category" class="form-label">Категория <span class="text-danger">*</span></label>
+                                <select class="form-select" id="category" name="category" required>
+                                    <option value="">Выберите категорию</option>
+                                    {% for cat in categories %}
+                                        <option value="{{ cat }}" 
+                                                {% if sparepart and sparepart.category == cat %}selected{% endif %}>
+                                            {{ cat }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">Или введите новую категорию</div>
+                                <input type="text" class="form-control mt-2" placeholder="Новая категория" 
+                                       onchange="addNewCategory(this.value)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="price" class="form-label">Цена <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="price" name="price" 
+                                           value="{% if sparepart %}{{ sparepart.price }}{% endif %}" 
+                                           step="0.01" min="0" required>
+                                    <span class="input-group-text">₽</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="quantity_in_stock" class="form-label">Количество на складе <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="quantity_in_stock" name="quantity_in_stock" 
+                                           value="{% if sparepart %}{{ sparepart.quantity_in_stock }}{% endif %}" 
+                                           min="0" required>
+                                    <span class="input-group-text">шт.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Описание</label>
+                        <textarea class="form-control" id="description" name="description" rows="4" 
+                                  placeholder="Детальное описание запчасти, совместимость, характеристики...">{% if sparepart %}{{ sparepart.description }}{% endif %}</textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> 
+                            {% if sparepart %}Сохранить изменения{% else %}Создать запчасть{% endif %}
+                        </button>
+                        <a href="{% url 'admin_custom:spareparts_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Отмена
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    {% if sparepart %}
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0">Информация о запчасти</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>ID:</strong> {{ sparepart.id }}</p>
+                <p><strong>Дата добавления:</strong> {{ sparepart.created_at|date:"d.m.Y H:i" }}</p>
+                <p><strong>Последнее обновление:</strong> {{ sparepart.updated_at|date:"d.m.Y H:i" }}</p>
+                <p><strong>Статус:</strong> 
+                    {% if sparepart.quantity_in_stock > 0 %}
+                        <span class="badge bg-success">В наличии</span>
+                    {% else %}
+                        <span class="badge bg-danger">Нет в наличии</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% block extra_js %}
+<script>
+function addNewCategory(value) {
+    if (value) {
+        const categorySelect = document.getElementById('category');
+        const newOption = document.createElement('option');
+        newOption.value = value;
+        newOption.text = value;
+        newOption.selected = true;
+        categorySelect.appendChild(newOption);
+    }
+}
+</script>
+{% endblock %}
+{% endblock %}

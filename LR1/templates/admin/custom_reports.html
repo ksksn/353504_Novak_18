@@ -1,0 +1,132 @@
+{% extends "admin/base_site.html" %}
+{% load admin_urls static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <h1>{{ title }}</h1>
+    
+    <!-- Общая статистика -->
+    <div class="module">
+        <table summary="Общая статистика">
+            <caption><a href="#" class="section">Общая статистика</a></caption>
+            <thead>
+                <tr>
+                    <th scope="col">Показатель</th>
+                    <th scope="col">Значение</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Всего ремонтов</td>
+                    <td>{{ repairs_count|default:0 }}</td>
+                </tr>
+                <tr>
+                    <td>Выполнено ремонтов</td>
+                    <td>{{ completed_repairs|default:0 }}</td>
+                </tr>
+                <tr>
+                    <td>Общая выручка</td>
+                    <td>{{ total_revenue|floatformat:2|default:0 }} руб.</td>
+                </tr>
+                <tr>
+                    <td>Активных клиентов</td>
+                    <td>{{ active_clients|default:0 }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Топ клиентов -->
+    <div class="module">
+        <table summary="Топ клиентов по потраченной сумме">
+            <caption><a href="#" class="section">Топ клиентов</a></caption>
+            <thead>
+                <tr>
+                    <th scope="col">Клиент</th>
+                    <th scope="col">Количество ремонтов</th>
+                    <th scope="col">Общая сумма</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for client in top_clients %}
+                <tr>
+                    <td>{{ client.user.get_full_name }}</td>
+                    <td>{{ client.repairs_count }}</td>
+                    <td>{{ client.total_spent|floatformat:2 }} руб.</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">Нет данных</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Популярные запчасти -->
+    <div class="module">
+        <table summary="Популярные запчасти">
+            <caption><a href="#" class="section">Популярные запчасти</a></caption>
+            <thead>
+                <tr>
+                    <th scope="col">Запчасть</th>
+                    <th scope="col">Категория</th>
+                    <th scope="col">Количество использований</th>
+                    <th scope="col">Цена</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for part in popular_parts %}
+                <tr>
+                    <td>{{ part.name }}</td>
+                    <td>{{ part.category }}</td>
+                    <td>{{ part.usage_count }}</td>
+                    <td>{{ part.price|floatformat:2 }} руб.</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">Нет данных</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Статистика по месяцам -->
+    <div class="module">
+        <table summary="Статистика по месяцам {{ current_year }} года">
+            <caption><a href="#" class="section">Статистика по месяцам {{ current_year }} года</a></caption>
+            <thead>
+                <tr>
+                    <th scope="col">Месяц</th>
+                    <th scope="col">Количество ремонтов</th>
+                    <th scope="col">Сумма</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for month_data in monthly_stats %}
+                <tr>
+                    <td>{{ month_data.month_name }}</td>
+                    <td>{{ month_data.count }}</td>
+                    <td>{{ month_data.total|floatformat:2 }} руб.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Быстрые действия -->
+    <div class="module">
+        <h2>Быстрые действия</h2>
+        <ul>
+            <li><a href="{% url 'admin:main_repair_changelist' %}">Управление ремонтами</a></li>
+            <li><a href="{% url 'admin:main_contract_changelist' %}">Управление договорами</a></li>
+            <li><a href="{% url 'admin:main_client_changelist' %}">Управление клиентами</a></li>
+            <li><a href="{% url 'admin:main_sparepart_changelist' %}">Управление запчастями</a></li>
+            <li><a href="{% url 'admin:main_service_changelist' %}">Управление услугами</a></li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

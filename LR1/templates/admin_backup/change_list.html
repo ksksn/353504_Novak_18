@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }} | Админка</title>
+</head>
+<body>
+    <header>
+        <h1>Административная панель сервисного центра</h1>
+        <div>
+            <span>ДОБРО ПОЖАЛОВАТЬ, {{ user.username|upper }}.</span>
+            <a href="/">ОТКРЫТЬ САЙТ</a> /
+            <a href="/admin/password_change/">ИЗМЕНИТЬ ПАРОЛЬ</a> /
+            <a href="/admin/logout/">ВЫЙТИ</a>
+        </div>
+        <nav>
+            <a href="/admin/">Главная</a> &gt; 
+            <a href="/admin/{{ opts.app_label }}/">{{ opts.app_label|title }}</a> &gt; 
+            {{ opts.verbose_name_plural|title }}
+        </nav>
+    </header>
+
+    <main>
+        <h2>{{ title }}</h2>
+        
+        {% if cl.search_fields %}
+        <form method="get">
+            <input type="text" name="q" value="{{ cl.query }}" placeholder="Поиск">
+            <input type="submit" value="Найти">
+        </form>
+        {% endif %}
+
+        <div>
+            <a href="add/">Добавить {{ opts.verbose_name }}</a>
+        </div>
+
+        {% if result_list %}
+        <table border="1">
+            <thead>
+                <tr>
+                    {% for header in result_headers %}
+                    <th>{{ header.text }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                <tr>
+                    {% for item in result %}
+                    <td>{{ item }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Записи не найдены.</p>
+        {% endif %}
+
+        {% if cl.paginator.num_pages > 1 %}
+        <div>
+            {% if cl.result_list.has_previous %}
+            <a href="?page={{ cl.result_list.previous_page_number }}">← Предыдущая</a>
+            {% endif %}
+            
+            Страница {{ cl.result_list.number }} из {{ cl.paginator.num_pages }}
+            
+            {% if cl.result_list.has_next %}
+            <a href="?page={{ cl.result_list.next_page_number }}">Следующая →</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </main>
+</body>
+</html>

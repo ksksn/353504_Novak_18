@@ -1,0 +1,275 @@
+{% extends 'base.html' %}
+
+{% block title %}Наши услуги{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Наши услуги</h1>
+    
+    <!-- Фильтры -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse">
+                            <i class="fas fa-filter"></i> Фильтры и поиск
+                        </button>
+                    </h5>
+                </div>
+                <div id="filterCollapse" class="collapse show">
+                    <div class="card-body">
+                        <form method="get" class="row g-3">
+                            <!-- Поиск -->
+                            <div class="col-md-4">
+                                <label for="search" class="form-label">Поиск по названию</label>
+                                <input type="text" class="form-control" id="search" name="search" 
+                                       value="{{ current_search }}" placeholder="Введите название услуги...">
+                            </div>
+                            
+                            <!-- Категория -->
+                            <div class="col-md-4">
+                                <label for="category" class="form-label">Категория</label>
+                                <select class="form-select" id="category" name="category">
+                                    <option value="all" {% if current_category == 'all' %}selected{% endif %}>Все категории</option>
+                                    {% for service_type in service_types %}
+                                        <option value="{{ service_type.id }}" 
+                                                {% if current_category == service_type.id|stringformat:"s" %}selected{% endif %}>
+                                            {{ service_type.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <!-- Сортировка -->
+                            <div class="col-md-4">
+                                <label for="sort" class="form-label">Сортировка</label>
+                                <select class="form-select" id="sort" name="sort">
+                                    <option value="name" {% if current_sort == 'name' %}selected{% endif %}>По названию</option>
+                                    <option value="price_asc" {% if current_sort == 'price_asc' %}selected{% endif %}>По цене (возрастание)</option>
+                                    <option value="price_desc" {% if current_sort == 'price_desc' %}selected{% endif %}>По цене (убывание)</option>
+                                    <option value="category" {% if current_sort == 'category' %}selected{% endif %}>По категории</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Диапазон цен -->
+                            <div class="col-md-6">
+                                <label class="form-label">Диапазон цен (BYN)</label>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <input type="number" class="form-control" name="min_price" 
+                                               value="{{ current_min_price }}" placeholder="От {{ min_price_available }}" 
+                                               min="0" max="{{ max_price_available }}" step="0.01">
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="number" class="form-control" name="max_price" 
+                                               value="{{ current_max_price }}" placeholder="До {{ max_price_available }}" 
+                                               min="0" max="{{ max_price_available }}" step="0.01">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Кнопки -->
+                            <div class="col-md-6 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="fas fa-search"></i> Применить фильтры
+                                </button>
+                                <a href="{% url 'main:service_list' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times"></i> Сбросить
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Результаты поиска -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="text-muted">
+                    {% if services %}
+                        Найдено услуг: {{ services|length }}
+                        {% if current_search or current_category != 'all' or current_min_price or current_max_price %}
+                            (отфильтровано)
+                        {% endif %}
+                    {% else %}
+                        Услуги не найдены
+                    {% endif %}
+                </h6>
+                
+                {% if current_search or current_category != 'all' or current_min_price or current_max_price %}
+                <div class="badge bg-info">
+                    Активные фильтры:
+                    {% if current_search %}Поиск: "{{ current_search }}"{% endif %}
+                    {% if current_category != 'all' %}Категория{% endif %}
+                    {% if current_min_price %}Цена от {{ current_min_price }}{% endif %}
+                    {% if current_max_price %}до {{ current_max_price }}{% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    
+    <!-- Список услуг -->
+    <div class="row">
+        {% if services %}
+            {% for service in services %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title">{{ service.name }}</h5>
+                                {% if service.service_type %}
+                                    <span class="badge bg-secondary">{{ service.service_type.name }}</span>
+                                {% endif %}
+                            </div>
+                            
+                            <p class="card-text text-muted">
+                                {{ service.description|default:"Описание отсутствует"|truncatechars:100 }}
+                            </p>
+                            
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="price">
+                                        {% if service.price > 0 %}
+                                            <span class="h5 text-primary mb-0">{{ service.price }} BYN</span>
+                                        {% else %}
+                                            <span class="h6 text-success mb-0">Бесплатно</span>
+                                        {% endif %}
+                                    </div>
+                                    {% if user.is_authenticated %}
+                                        <form method="post" action="{% url 'main:add_to_cart' service.id %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="quantity" value="1">
+                                            <button type="submit" class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-cart-plus"></i> В корзину
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <button class="btn btn-outline-secondary btn-sm" disabled>
+                                            <i class="fas fa-info-circle"></i> Войдите для заказа
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle fa-2x mb-3"></i>
+                    <h5>Услуги не найдены</h5>
+                    <p class="mb-0">
+                        {% if current_search or current_category != 'all' or current_min_price or current_max_price %}
+                            Попробуйте изменить параметры фильтрации или 
+                            <a href="{% url 'main:service_list' %}" class="alert-link">сбросить все фильтры</a>
+                        {% else %}
+                            В настоящее время услуги не доступны.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Пагинация -->
+    {% if is_paginated %}
+        <nav aria-label="Навигация по страницам">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+                {% endif %}
+                
+                <li class="page-item active">
+                    <span class="page-link">{{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+                </li>
+                
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+</div>
+
+<style>
+.price {
+    font-weight: 600;
+}
+
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.badge {
+    font-size: 0.75em;
+}
+
+.collapse .card-body {
+    background-color: #f8f9fa;
+}
+
+.btn-outline-primary:hover {
+    transform: none;
+}
+</style>
+
+<script>
+// Автоматическая отправка формы при изменении категории или сортировки
+document.getElementById('category').addEventListener('change', function() {
+    this.form.submit();
+});
+
+document.getElementById('sort').addEventListener('change', function() {
+    this.form.submit();
+});
+
+// Подсказки для диапазона цен
+document.addEventListener('DOMContentLoaded', function() {
+    const minPriceInput = document.querySelector('input[name="min_price"]');
+    const maxPriceInput = document.querySelector('input[name="max_price"]');
+    
+    if (minPriceInput && maxPriceInput) {
+        minPriceInput.addEventListener('change', function() {
+            if (this.value && maxPriceInput.value && parseFloat(this.value) > parseFloat(maxPriceInput.value)) {
+                maxPriceInput.value = this.value;
+            }
+        });
+        
+        maxPriceInput.addEventListener('change', function() {
+            if (this.value && minPriceInput.value && parseFloat(this.value) < parseFloat(minPriceInput.value)) {
+                minPriceInput.value = this.value;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

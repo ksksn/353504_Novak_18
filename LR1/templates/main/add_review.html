@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Добавить отзыв{% endblock %}
+
+{% block content %}
+<div>
+    <h3>Оставить отзыв</h3>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div>{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div>
+            <label for="{{ form.service.id_for_label }}">Услуга (необязательно)</label>
+            {{ form.service }}
+            {% if form.service.errors %}
+                <div>{{ form.service.errors }}</div>
+            {% endif %}
+            <div>Выберите конкретную услугу или оставьте общий отзыв</div>
+        </div>
+        
+        <div>
+            <label for="{{ form.rating.id_for_label }}">Оценка</label>
+            {{ form.rating }}
+            {% if form.rating.errors %}
+                <div>{{ form.rating.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div>
+            <label for="{{ form.text.id_for_label }}">Текст отзыва</label>
+            {{ form.text }}
+            {% if form.text.errors %}
+                <div>{{ form.text.errors }}</div>
+            {% endif %}
+            <div>Минимум 10 символов</div>
+        </div>
+        
+        {% if form.non_field_errors %}
+            <div>{{ form.non_field_errors }}</div>
+        {% endif %}
+        
+        <div>
+            <a href="{% url 'main:reviews_list' %}">Отмена</a>
+            <button type="submit">Отправить отзыв</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Промокоды{% endblock %}
+
+{% block content %}
+<div>
+    <h1>Действующие промокоды</h1>
+    
+    <div>
+        {% if active_codes %}
+            {% for promo in active_codes %}
+                <div>
+                    <div>
+                        <h4>{{ promo.code }}</h4>
+                        <p>{{ promo.description|default:"Описание отсутствует" }}</p>
+                        <p><strong>Скидка:</strong> {{ promo.discount_percent }}%</p>
+                        <p><small>Действует до: {{ promo.valid_until|date:"d.m.Y" }}</small></p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div>
+                <p>В настоящее время активных промокодов нет.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

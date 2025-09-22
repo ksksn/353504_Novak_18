@@ -1,0 +1,140 @@
+{% extends 'admin_custom/base.html' %}
+
+{% block page_title %}Добавить запчасть{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'admin_custom:spare_parts_list' %}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left"></i> Назад к списку
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">Добавление новой запчасти</h6>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Название запчасти *</label>
+                        <input type="text" name="name" id="name" class="form-control" 
+                               placeholder="Например: Экран iPhone 12" required>
+                        <div class="form-text">Полное название запчасти</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="category" class="form-label">Категория *</label>
+                        <input type="text" name="category" id="category" class="form-control" 
+                               list="categoryList" placeholder="Выберите или введите новую">
+                        <datalist id="categoryList">
+                            {% for category in categories %}
+                            <option value="{{ category }}">
+                            {% endfor %}
+                        </datalist>
+                        <div class="form-text">Выберите существующую или создайте новую категорию</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="price" class="form-label">Цена (₽) *</label>
+                        <input type="number" name="price" id="price" class="form-control" 
+                               step="0.01" min="0.01" placeholder="0.00" required>
+                        <div class="form-text">Цена за единицу товара</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="quantity_in_stock" class="form-label">Количество на складе</label>
+                        <input type="number" name="quantity_in_stock" id="quantity_in_stock" 
+                               class="form-control" value="0" min="0">
+                        <div class="form-text">Начальное количество на складе (по умолчанию 0)</div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Добавить запчасть
+                        </button>
+                        <a href="{% url 'admin_custom:spare_parts_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Отмена
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Подсказки -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-info">
+                    <i class="fas fa-lightbulb"></i> Рекомендации
+                </h6>
+            </div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li><strong>Название:</strong> Укажите полное и понятное название</li>
+                    <li><strong>Категория:</strong> Используйте существующие категории для единообразия</li>
+                    <li><strong>Цена:</strong> Указывайте актуальную цену с учетом НДС</li>
+                    <li><strong>Склад:</strong> Можно добавить без начальных остатков</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Популярные категории -->
+        {% if categories %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold">Существующие категории</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2">
+                    {% for category in categories %}
+                    <span class="badge bg-secondary cursor-pointer" 
+                          onclick="document.getElementById('category').value='{{ category }}'">
+                        {{ category }}
+                    </span>
+                    {% endfor %}
+                </div>
+                <small class="text-muted mt-2 d-block">Нажмите на категорию, чтобы выбрать её</small>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Валидация формы
+document.querySelector('form').addEventListener('submit', function(e) {
+    const name = document.getElementById('name').value.trim();
+    const category = document.getElementById('category').value.trim();
+    const price = parseFloat(document.getElementById('price').value);
+    
+    if (name.length < 3) {
+        e.preventDefault();
+        alert('Название запчасти должно содержать минимум 3 символа');
+        return false;
+    }
+    
+    if (category.length < 2) {
+        e.preventDefault();
+        alert('Категория должна содержать минимум 2 символа');
+        return false;
+    }
+    
+    if (price <= 0) {
+        e.preventDefault();
+        alert('Цена должна быть больше 0');
+        return false;
+    }
+});
+
+// Добавляем стили для cursor-pointer
+document.addEventListener('DOMContentLoaded', function() {
+    const style = document.createElement('style');
+    style.textContent = '.cursor-pointer { cursor: pointer; }';
+    document.head.appendChild(style);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends 'base_simple.html' %}
+
+{% block title %}Корзина{% endblock %}
+
+{% block content %}
+<h1>Корзина</h1>
+
+{% if cart_items %}
+    <p>Услуг в корзине: {{ items_count }} (общее количество: {{ cart.total_items }})</p>
+    <p><strong>Общая стоимость: {{ total_price }} BYN</strong></p>
+    
+    <hr>
+    
+    {% for item in cart_items %}
+        <div>
+            <h4>{{ item.service.name }}</h4>
+            <p>{{ item.service.description }}</p>
+            <p>Цена за единицу: {{ item.service.price }} BYN</p>
+            <p>Категория: {{ item.service.service_type.name }}</p>
+            
+            <form method="post" action="{% url 'main:update_cart_item' item.id %}">
+                {% csrf_token %}
+                <p>
+                    Количество: 
+                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="10">
+                    <input type="submit" value="Обновить">
+                </p>
+            </form>
+            
+            <p>Стоимость: {{ item.total_price }} BYN</p>
+            
+            <form method="post" action="{% url 'main:remove_from_cart' item.id %}">
+                {% csrf_token %}
+                <input type="submit" value="Удалить из корзины">
+            </form>
+            
+            <hr>
+        </div>
+    {% endfor %}
+    
+    <div>
+        <h3>Подать заявку</h3>
+        <p>Общая стоимость: {{ total_price }} BYN</p>
+        <a href="{% url 'main:submit_service_request' %}">Подать заявку на услуги</a>
+    </div>
+    
+{% else %}
+    <p>Корзина пуста</p>
+    <p><a href="{% url 'main:service_list' %}">Перейти к услугам</a></p>
+{% endif %}
+
+{% endblock %}

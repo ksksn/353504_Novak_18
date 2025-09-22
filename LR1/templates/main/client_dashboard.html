@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Личный кабинет клиента{% endblock %}
+
+{% block content %}
+<div>
+    <h1>Личный кабинет клиента</h1>
+    
+    <div>
+        <div>
+            <h3>Информация о клиенте</h3>
+            <div>
+                <p><strong>Имя:</strong> {{ client.user.first_name }} {{ client.user.last_name }}</p>
+                <p><strong>Email:</strong> {{ client.user.email }}</p>
+                <p><strong>Телефон:</strong> {{ client.phone_number|default:"Не указан" }}</p>
+                <p><strong>Дата регистрации:</strong> {{ client.user.date_joined|date:"d.m.Y" }}</p>
+            </div>
+        </div>
+        
+        <div>
+            <h3>Доступные промокоды</h3>
+            <div>
+                {% if available_promocodes %}
+                    {% for promo in available_promocodes %}
+                        <div>
+                            <strong>{{ promo.code }}</strong> - скидка {{ promo.discount_percent }}%
+                            <br><small>Действует до: {{ promo.valid_until|date:"d.m.Y" }}</small>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>Нет доступных промокодов</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div>
+        <div>
+            <h3>Мои заказы</h3>
+            <div>
+                {% if orders %}
+                    <table border="1">
+                        <thead>
+                            <tr>
+                                <th>Статус</th>
+                                <th>Сумма</th>
+                                <th>Дата создания</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr>
+                                <td>{{ order.get_status_display }}</td>
+                                <td>{{ order.total_sum|default:"Не указана" }} руб.</td>
+                                <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>У вас пока нет заказов</p>
+                    <a href="{% url 'main:service_list' %}">Посмотреть услуги</a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div>
+            <h3>Мои договоры</h3>
+            <div>
+                {% if contracts %}
+                    {% for contract in contracts %}
+                        <div>
+                            <h4>Договор №{{ contract.number }}</h4>
+                            <p><strong>Дата заключения:</strong> {{ contract.date_signed|date:"d.m.Y" }}</p>
+                            <p><strong>Ответственный сотрудник:</strong> 
+                                {{ contract.employee.user.first_name }} {{ contract.employee.user.last_name }}
+                            </p>
+                            <p><strong>Общая сумма:</strong> {{ contract.total_sum }} руб.</p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>У вас пока нет договоров</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

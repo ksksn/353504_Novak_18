@@ -1,0 +1,44 @@
+{% extends 'base_simple.html' %}
+
+{% block title %}Мои заявки{% endblock %}
+
+{% block content %}
+<h1>Мои заявки</h1>
+
+{% if requests %}
+    {% for request in requests %}
+        <div>
+            <h3>Заявка #{{ request.id }}</h3>
+            <p>Дата создания: {{ request.created_at|date:"d.m.Y H:i" }}</p>
+            <p>Статус: 
+                {% if request.status == 'pending' %}
+                    Ожидает рассмотрения
+                {% elif request.status == 'approved' %}
+                    Одобрена
+                {% elif request.status == 'rejected' %}
+                    Отклонена
+                {% elif request.status == 'completed' %}
+                    Выполнена
+                {% endif %}
+            </p>
+            <p>Общая стоимость: {{ request.total_price }} BYN</p>
+            
+            {% if request.assigned_employee %}
+                <p>Назначенный мастер: {{ request.assigned_employee.user.get_full_name }}</p>
+            {% endif %}
+            
+            {% if request.admin_notes %}
+                <p>Примечания администратора: {{ request.admin_notes }}</p>
+            {% endif %}
+            
+            <p><a href="{% url 'main:service_request_detail' request.id %}">Подробнее</a></p>
+            
+            <hr>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>У вас пока нет заявок</p>
+    <p><a href="{% url 'main:service_list' %}">Перейти к услугам</a></p>
+{% endif %}
+
+{% endblock %}

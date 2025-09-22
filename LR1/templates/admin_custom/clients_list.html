@@ -1,0 +1,342 @@
+{% extends 'admin_custom/base.html' %}
+
+{% block title %}Клиенты - Админ-панель{% endblock %}
+
+{% block extra_css %}
+<style>
+.client-avatar {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 16px;
+    box-shadow: 0 3px 10px rgba(var(--primary-blue-rgb), 0.3);
+}
+
+.search-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(var(--light-blue-rgb), 0.3));
+    border: 1px solid rgba(var(--primary-blue-rgb), 0.1);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+.clients-table-card {
+    background: rgba(255,255,255,0.95);
+    border: 1px solid rgba(var(--primary-blue-rgb), 0.1);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.clients-table-card .card-header {
+    background: linear-gradient(135deg, var(--soft-gray), var(--light-blue));
+    border-bottom: 1px solid rgba(var(--primary-blue-rgb), 0.1);
+    padding: 20px;
+}
+
+.clients-table {
+    border-radius: 0;
+    margin-bottom: 0;
+}
+
+.clients-table thead th {
+    background: linear-gradient(135deg, var(--soft-gray), rgba(var(--light-blue-rgb), 0.5));
+    border: none;
+    padding: 15px;
+    font-weight: 600;
+    color: var(--dark-gray);
+    border-bottom: 2px solid rgba(var(--primary-blue-rgb), 0.1);
+}
+
+.clients-table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.clients-table tbody tr:hover {
+    background: linear-gradient(135deg, rgba(var(--light-blue-rgb), 0.1), rgba(var(--soft-gray-rgb), 0.1));
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.clients-table tbody td {
+    padding: 18px 15px;
+    border: none;
+    border-bottom: 1px solid rgba(var(--primary-blue-rgb), 0.05);
+    vertical-align: middle;
+}
+
+.client-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.client-details h6 {
+    color: var(--dark-gray);
+    font-weight: 600;
+    margin: 0;
+}
+
+.client-details small {
+    color: var(--muted-blue);
+    font-size: 0.85em;
+}
+
+.contact-info div {
+    color: var(--dark-gray);
+    font-weight: 500;
+}
+
+.contact-info small {
+    color: var(--muted-blue);
+    font-size: 0.85em;
+}
+
+.table-actions {
+    white-space: nowrap;
+}
+
+.action-btn {
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin: 0 3px;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.action-btn-edit {
+    background: linear-gradient(135deg, rgba(var(--primary-blue-rgb), 0.1), rgba(var(--secondary-blue-rgb), 0.1));
+    color: var(--primary-blue);
+    border-color: rgba(var(--primary-blue-rgb), 0.2);
+}
+
+.action-btn-edit:hover {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(var(--primary-blue-rgb), 0.3);
+}
+
+.action-btn-delete {
+    background: linear-gradient(135deg, rgba(220, 53, 69, 0.1), rgba(220, 53, 69, 0.1));
+    color: #dc3545;
+    border-color: rgba(220, 53, 69, 0.2);
+}
+
+.action-btn-delete:hover {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, rgba(var(--light-blue-rgb), 0.1), rgba(var(--soft-gray-rgb), 0.1));
+    border-radius: 15px;
+    margin: 20px 0;
+}
+
+.empty-state .fa-users {
+    color: var(--muted-blue);
+    margin-bottom: 20px;
+    opacity: 0.7;
+}
+
+.empty-state h5 {
+    color: var(--dark-gray);
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    color: var(--muted-blue);
+    margin-bottom: 25px;
+}
+
+.pagination {
+    margin-top: 30px;
+}
+
+.page-link {
+    background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(var(--primary-blue-rgb), 0.2);
+    color: var(--primary-blue);
+    padding: 10px 15px;
+    margin: 0 3px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.page-link:hover {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
+    border-color: var(--primary-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(var(--primary-blue-rgb), 0.3);
+}
+
+.page-item.active .page-link {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    border-color: var(--primary-blue);
+    color: white;
+    box-shadow: 0 5px 15px rgba(var(--primary-blue-rgb), 0.3);
+}
+
+.page-item.disabled .page-link {
+    background: rgba(var(--soft-gray-rgb), 0.5);
+    color: var(--muted-blue);
+    border-color: rgba(var(--primary-blue-rgb), 0.1);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-users"></i> Клиенты</h1>
+    <a href="{% url 'admin_custom:client_add' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Добавить клиента
+    </a>
+</div>
+
+<!-- Поиск -->
+<div class="card search-card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-8">
+                <label class="form-label">Поиск клиентов</label>
+                <input type="text" class="form-control" name="search" 
+                       value="{{ search }}" placeholder="Имя, фамилия, email, телефон...">
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2">
+                    <i class="fas fa-search"></i> Найти
+                </button>
+                <a href="{% url 'admin_custom:clients_list' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Сброс
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Список клиентов -->
+<div class="card clients-table-card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold">
+            Список клиентов ({{ clients.paginator.count }})
+        </h6>
+    </div>
+    <div class="card-body p-0">
+        {% if clients %}
+            <div class="table-responsive">
+                <table class="table table-hover clients-table">
+                    <thead>
+                        <tr>
+                            <th>Клиент</th>
+                            <th>Контакты</th>
+                            <th>Адрес</th>
+                            <th>Дата регистрации</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for client in clients %}
+                        <tr>
+                            <td>
+                                <div class="client-info">
+                                    <div class="client-avatar">
+                                        <span>{{ client.user.first_name|first }}{{ client.user.last_name|first }}</span>
+                                    </div>
+                                    <div class="client-details">
+                                        <h6>{{ client.user.first_name }} {{ client.user.last_name }}</h6>
+                                        <small>ID: {{ client.id }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="contact-info">
+                                    <div>{{ client.user.email }}</div>
+                                    <small>{{ client.phone_number|default:"Не указан" }}</small>
+                                </div>
+                            </td>
+                            <td>{{ client.address|default:"Не указан" }}</td>
+                            <td>{{ client.user.date_joined|date:"d.m.Y" }}</td>
+                            <td class="table-actions">
+                                <a href="{% url 'admin_custom:client_edit' client.id %}" 
+                                   class="btn btn-sm action-btn action-btn-edit" title="Редактировать">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button class="btn btn-sm action-btn action-btn-delete" 
+                                        onclick="deleteClient({{ client.id }})" title="Удалить">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Пагинация -->
+            {% if clients.has_other_pages %}
+            <nav aria-label="Пагинация клиентов">
+                <ul class="pagination justify-content-center mt-4">
+                    {% if clients.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if search %}search={{ search }}&{% endif %}page={{ clients.previous_page_number }}">
+                                Предыдущая
+                            </a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for num in clients.paginator.page_range %}
+                        {% if clients.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > clients.number|add:'-3' and num < clients.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?{% if search %}search={{ search }}&{% endif %}page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if clients.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if search %}search={{ search }}&{% endif %}page={{ clients.next_page_number }}">
+                                Следующая
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-users fa-3x"></i>
+                <h5>Клиентов не найдено</h5>
+                <p>Попробуйте изменить критерии поиска или добавьте нового клиента</p>
+                <a href="{% url 'admin_custom:client_add' %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Добавить первого клиента
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function deleteClient(clientId) {
+    if (confirm('Вы уверены, что хотите удалить этого клиента?')) {
+        // В реальном проекте здесь должен быть AJAX запрос
+        window.location.href = '/custom-admin/clients/' + clientId + '/delete/';
+    }
+}
+</script>
+{% endblock %}

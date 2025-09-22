@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Создание профиля клиента{% endblock %}
+
+{% block content %}
+<div>
+    <div>
+        <h3>Завершение регистрации клиента</h3>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div>{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        
+        <div>
+            <p><strong>Добро пожаловать, {{ user.get_full_name|default:user.username }}!</strong></p>
+            <p>Для оставления отзывов и доступа к полному функционалу сайта необходимо завершить регистрацию как клиент, указав дополнительную информацию.</p>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div>
+                <label for="{{ form.phone.id_for_label }}">Номер телефона *</label>
+                {{ form.phone }}
+                {% if form.phone.errors %}
+                    <div>{{ form.phone.errors }}</div>
+                {% endif %}
+                <small>Формат: +375 (29) XXX-XX-XX</small>
+            </div>
+            
+            <div>
+                <label for="{{ form.address.id_for_label }}">Адрес *</label>
+                {{ form.address }}
+                {% if form.address.errors %}
+                    <div>{{ form.address.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div>
+                <label for="{{ form.birth_date.id_for_label }}">Дата рождения *</label>
+                {{ form.birth_date }}
+                {% if form.birth_date.errors %}
+                    <div>{{ form.birth_date.errors }}</div>
+                {% endif %}
+                <small>{{ form.birth_date.help_text }}</small>
+            </div>
+            
+            {% if form.non_field_errors %}
+                <div>{{ form.non_field_errors }}</div>
+            {% endif %}
+            
+            <div>
+                <a href="{% url 'main:index' %}">Пропустить</a>
+                <button type="submit">Завершить регистрацию</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
